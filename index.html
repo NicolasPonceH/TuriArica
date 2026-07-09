@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="es-CL">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TuriArica | Turismo Accesible e Inclusivo 🌸</title>
+    <meta name="description"
+        content="Descubre Arica de forma inclusiva. Lugares turísticos, mapa interactivo y accesibilidad total.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@500;600;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <nav class="navbar" aria-label="Navegación principal">
+        <div class="nav-container">
+            <a href="#" class="logo" aria-label="Inicio TuriArica">🌸 TuriArica</a>
+            <ul class="nav-links">
+                <li><a href="#inicio">Inicio</a></li>
+                <li><a href="#lugares">Lugares</a></li>
+                <li><a href="#mapa">Mapa</a></li>
+                <li><a href="#accesibilidad">Accesibilidad</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <header id="inicio" class="hero">
+        <div class="hero-content">
+            <h1 class="main-title">Arica, La Ciudad de la Eterna Primavera 🌸</h1>
+            <p class="subtitle">Descubre nuestra ciudad de forma inclusiva y accesible para todos</p>
+            <div class="hero-buttons">
+                <a href="#mapa" class="btn btn-primary">🗺️ Explorar el Mapa</a>
+                <a href="#lugares" class="btn btn-secondary">📍 Ver Lugares</a>
+            </div>
+        </div>
+        <a href="#lugares" class="scroll-arrow">↓</a>
+    </header>
+
+    <main id="main-content">
+        <section id="lugares" class="places-section">
+            <h2 class="sr-only">Lugares Turísticos</h2>
+            <div class="filter-container">
+                <div class="filter-scroll" role="group" aria-label="Filtrar lugares">
+                    <button class="filter-btn active" data-category="Todos">Todos</button>
+                    <button class="filter-btn" data-category="Playa">🏖️ Playas</button>
+                    <button class="filter-btn" data-category="Museo">🏛️ Museos</button>
+                    <button class="filter-btn" data-category="Histórico">⛪ Histórico</button>
+                    <button class="filter-btn" data-category="Naturaleza">🌿 Naturaleza</button>
+                    <button class="filter-btn" data-category="Gastronomía">🍽️ Gastronomía</button>
+                    <button class="filter-btn" data-category="Deporte">⚽ Deporte</button>
+                    <button class="filter-btn" data-category="Paseo">🛍️ Paseo</button>
+                </div>
+            </div>
+            <div class="places-grid" id="placesGrid" aria-live="polite"></div>
+        </section>
+
+        <section id="mapa" class="map-section">
+            <div class="map-container">
+                <h2 class="section-title">🗺️ Mapa Turístico de Arica</h2>
+                <div id="map"></div>
+                <div id="ruta-info" aria-live="polite"></div>
+                <div class="map-legend"></div>
+            </div>
+        </section>
+    </main>
+
+    <!-- MODAL ÚNICO: muestra info completa (Ver más) o solo transporte (Info locomoción) -->
+    <dialog id="placeModal" class="modal">
+        <article class="modal-content">
+            <button class="close-modal" aria-label="Cerrar">&times;</button>
+            <div class="modal-body">
+                <h2 id="modalTitle" style="color: var(--color-dark-navy); margin-bottom: 5px;"></h2>
+                <span id="modalBadge" class="modal-badge" style="display: inline-block; margin-bottom: 15px;"></span>
+
+                <!-- Contenedor para la información completa (Ver más) -->
+                <!-- Contenedor para la información completa (Ver más) -->
+                <div id="modalFullInfo" style="display: none;">
+                    <p id="modalDesc"></p>
+                    <div class="modal-info">
+                        <h3>📍 Cómo llegar</h3>
+                        <p id="modalDirections"></p>
+                        <h3>🕒 Horario</h3>
+                        <p id="modalHours"></p>
+                    </div>
+                    <!-- NUEVOS BOTONES DENTRO DEL MODAL -->
+                    <div class="modal-actions" style="display: flex; gap: 12px; margin-top: 20px;">
+                        <button id="modalAudioBtn" class="btn-icon btn-audio" style="flex: 1;">🔊 Escuchar
+                            descripción</button>
+                        <button id="modalRouteBtn" class="btn-icon btn-dir" style="flex: 1;">📍 Cómo llegar</button>
+                    </div>
+                </div>
+
+                <!-- Contenedor para la información de transporte (Info locomoción) -->
+                <div id="modalTransportInfo" style="display: none;">
+                    <div id="userLocationBadge"
+                        style="margin-bottom: 10px; font-size: 0.9rem; color: var(--color-terracotta); font-weight: 600;">
+                    </div>
+                    <div
+                        style="background: var(--color-sandy-beige); padding: 15px; border-radius: 12px; border-left: 5px solid var(--color-sky-blue);">
+                        <p id="modalTransportText" style="margin: 0; line-height: 1.5;"></p>
+                    </div>
+                    <p style="font-size: 0.8rem; color: #666; margin-top: 15px;">* Información basada en recorridos
+                        habituales de micros y colectivos de Arica.</p>
+                </div>
+            </div>
+        </article>
+    </dialog>
+
+    <div class="acc-toolbar" role="toolbar" aria-label="Herramientas de Accesibilidad">
+        <button id="btnAccToggle" class="acc-toggle" aria-label="Abrir herramientas de accesibilidad"
+            aria-expanded="false">
+            <span class="hamburger-icon">
+                <span></span>
+                <span></span>
+                <span></span>
+            </span>
+        </button>
+        <div class="acc-buttons" id="accButtons">
+            <button id="btnTextInc" class="acc-btn tooltip" data-tooltip="Aumentar texto">A+</button>
+            <button id="btnTextDec" class="acc-btn tooltip" data-tooltip="Disminuir texto">A-</button>
+            <button id="btnContrast" class="acc-btn tooltip" data-tooltip="Alto contraste">🌗</button>
+            <button id="btnAutoRead" class="acc-btn tooltip" data-tooltip="Lectura automática"
+                aria-pressed="false">🔊</button>
+            <button id="btnReadAll" class="acc-btn tooltip" data-tooltip="Leer página completa">📢</button>
+            <button id="btnAssistant" class="acc-btn tooltip" style="background: var(--color-sky-blue); color: white;"
+                data-tooltip="Asistente TuriArica">🤖</button>
+        </div>
+    </div>
+
+
+    <dialog id="assistantModal" class="modal assistant-modal">
+        <article class="modal-content">
+            <button class="close-modal"
+                onclick="stopSpeaking(); document.getElementById('assistantModal').close()">&times;</button>
+            <div class="modal-body">
+                <h2 style="color: var(--color-sky-blue);">🤖 Turi-Asistente</h2>
+                <div id="chatWindow" class="chat-window">
+                    <div class="msg bot-msg">¡Hola! Soy tu guía de Arica. ¿Qué tienes ganas de hacer hoy? Cuéntame si
+                        buscas una playa, un museo o algo para comer.</div>
+                </div>
+                <div class="chat-input-area">
+                    <input type="text" id="userInput" placeholder="Ej: Quiero ir a la playa..."
+                        aria-label="Escribe tu pregunta">
+                    <button id="btnVoice" aria-label="Hablar por micrófono">🎙️</button>
+                    <button id="btnSend">Enviar</button>
+                </div>
+            </div>
+        </article>
+    </dialog>
+    <footer id="accesibilidad" class="footer">
+        <div class="footer-content">
+            <div class="footer-logo">🌸 TuriArica</div>
+            <p class="tagline">Turismo accesible e inclusivo para todos</p>
+            <div class="footer-links">
+                <a href="#inicio">Inicio</a>
+                <a href="#lugares">Lugares</a>
+                <a href="#mapa">Mapa</a>
+            </div>
+            <div class="credits">Desarrollado con ❤️ para Arica, Chile · 2025</div>
+        </div>
+    </footer>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <script src="script.js"></script>
+</body>
+
+</html>
