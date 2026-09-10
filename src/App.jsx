@@ -262,18 +262,30 @@ function App() {
               className="bg-white rounded-3xl p-5 sm:p-8 max-w-2xl w-full relative shadow-2xl max-h-[90vh] overflow-y-auto"
               onClick={e => e.stopPropagation()}
             >
-              <button 
-                className="absolute top-4 right-4 p-2 rounded-full hover:bg-gray-100 text-gray-500"
-                onClick={() => setModalPlace(null)}
-              >
-                <LucideIcons.X size={20} />
-              </button>
+              {/* Place Hero Image in Modal */}
+              <div className="relative h-48 sm:h-60 -mx-5 -mt-5 sm:-mx-8 sm:-mt-8 mb-5 overflow-hidden">
+                <img 
+                  src={modalPlace.image} 
+                  alt={modalPlace.name} 
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-black/20" />
+                <button 
+                  className="absolute top-4 right-4 p-2 rounded-full bg-black/40 hover:bg-black/60 text-white backdrop-blur-md transition-colors"
+                  onClick={() => setModalPlace(null)}
+                  aria-label="Cerrar modal"
+                >
+                  <LucideIcons.X size={20} />
+                </button>
+                <div className="absolute bottom-4 left-5 right-5 text-white">
+                  <span className="inline-block px-3 py-0.5 bg-accent-500 text-white text-xs font-bold rounded-full mb-1.5 shadow-md">
+                    {modalPlace.category}
+                  </span>
+                  <h2 className="text-2xl sm:text-3xl font-extrabold text-white drop-shadow-md">{modalPlace.name}</h2>
+                </div>
+              </div>
               
               <div className="mb-6">
-                <span className="inline-block px-3 py-1 bg-accent-50 text-accent-600 text-xs font-bold rounded-full mb-3 border border-accent-200">
-                  {modalPlace.category}
-                </span>
-                <h2 className="text-2xl sm:text-3xl font-bold mb-3 text-gray-900">{modalPlace.name}</h2>
                 <p className="text-gray-600 leading-relaxed text-sm sm:text-base mb-5">{modalPlace.fullDesc}</p>
                 
                 <div className="bg-gray-50 rounded-xl p-5 border border-gray-100 space-y-4">

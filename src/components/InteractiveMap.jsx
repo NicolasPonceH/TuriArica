@@ -318,7 +318,13 @@ export default function InteractiveMap({
                 className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-md rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 p-2.5 sm:p-3 flex items-center justify-between gap-2 sm:gap-3"
               >
                 <div className="flex items-center gap-2 overflow-hidden">
-                  <span className="w-3 h-3 rounded-full shrink-0" style={{ backgroundColor: selectedPlace.color }} />
+                  {selectedPlace.image && (
+                    <img 
+                      src={selectedPlace.image} 
+                      alt="" 
+                      className="w-6 h-6 rounded-md object-cover shrink-0 border border-white/50 shadow-xs" 
+                    />
+                  )}
                   <span className="font-bold text-xs text-gray-900 dark:text-white truncate">
                     {selectedPlace.name}
                   </span>
@@ -356,17 +362,26 @@ export default function InteractiveMap({
                 exit={{ opacity: 0, y: -10, scale: 0.95 }}
                 className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-md rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700 p-3.5 sm:p-5 overflow-hidden max-h-[62vh] sm:max-h-[75vh] flex flex-col"
               >
-                {/* Header */}
+                {/* Header with Photo Thumbnail */}
                 <div className="flex items-start justify-between gap-2 mb-3">
-                  <div>
-                    <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-bold bg-accent-100 text-accent-700 dark:bg-accent-950 dark:text-accent-300 mb-1">
-                      {selectedPlace.category}
-                    </span>
-                    <h3 className="font-extrabold text-gray-900 dark:text-white text-lg leading-snug">
-                      {selectedPlace.name}
-                    </h3>
+                  <div className="flex items-center gap-2.5 overflow-hidden">
+                    {selectedPlace.image && (
+                      <img 
+                        src={selectedPlace.image} 
+                        alt={selectedPlace.name} 
+                        className="w-12 h-12 rounded-xl object-cover shadow-sm border border-gray-100 dark:border-gray-700 shrink-0" 
+                      />
+                    )}
+                    <div className="overflow-hidden">
+                      <span className="inline-block px-2 py-0.5 rounded-full text-[10px] font-bold bg-accent-100 text-accent-700 dark:bg-accent-950 dark:text-accent-300 mb-0.5">
+                        {selectedPlace.category}
+                      </span>
+                      <h3 className="font-extrabold text-gray-900 dark:text-white text-base leading-snug truncate">
+                        {selectedPlace.name}
+                      </h3>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-1">
+                  <div className="flex items-center gap-1 shrink-0">
                     <button 
                       onClick={() => setIsMinimized(true)}
                       className="p-1.5 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors"
