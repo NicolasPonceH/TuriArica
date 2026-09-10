@@ -148,35 +148,51 @@ export default function HomePage() {
 
       {showAssistant && <AssistantModal onClose={() => setShowAssistant(false)} />}
 
-      {/* Smart Itinerary Planner CTA Banner */}
-      <section className="max-w-6xl mx-auto px-4 sm:px-6 -mt-6 sm:-mt-8 relative z-20">
-        <div className="bg-gradient-to-r from-brand-600 via-indigo-600 to-accent-600 rounded-2xl sm:rounded-3xl p-4 sm:p-6 text-white shadow-xl flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-3 text-center sm:text-left">
-            <div className="w-12 h-12 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center shrink-0 shadow-inner">
+      {/* Travel Hub Section (Itinerary Planner + Live Beach Conditions) */}
+      <section className="max-w-6xl mx-auto px-4 sm:px-6 pt-12 sm:pt-16 pb-4 space-y-6">
+        {/* Smart Itinerary Planner CTA Banner */}
+        <div className="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 rounded-3xl p-6 sm:p-7 text-white shadow-xl border border-indigo-900/40 flex flex-col sm:flex-row items-center justify-between gap-5 relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-80 h-full bg-gradient-to-l from-brand-500/10 to-transparent pointer-events-none" />
+
+          <div className="flex items-center gap-4 text-center sm:text-left z-10">
+            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-brand-500 to-indigo-600 flex items-center justify-center shrink-0 shadow-lg shadow-brand-500/25">
               <Compass size={24} className="text-white" />
             </div>
             <div>
-              <h3 className="text-base sm:text-lg font-black leading-tight">
-                ¿Planeando tu viaje a Arica?
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-brand-500/20 text-brand-300 text-[10px] font-bold uppercase tracking-wider mb-1 border border-brand-500/30">
+                <Sparkles size={11} />
+                <span>Asistente de Viaje</span>
+              </div>
+              <h3 className="text-lg sm:text-xl font-black text-white leading-tight">
+                ¿Planeando tu viaje a la Eterna Primavera?
               </h3>
-              <p className="text-xs sm:text-sm text-white/85">
-                Genera un itinerario inteligente por horas y según tus intereses.
+              <p className="text-xs sm:text-sm text-slate-300 mt-0.5">
+                Genera un itinerario inteligente personalizado hora a hora según tus días y preferencias.
               </p>
             </div>
           </div>
 
           <button
             onClick={() => setShowPlanner(true)}
-            className="px-5 py-3 rounded-xl bg-white text-brand-700 hover:bg-slate-50 font-black text-xs sm:text-sm shadow-md transition-all hover:scale-105 shrink-0 flex items-center gap-2"
+            className="px-6 py-3.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xs sm:text-sm shadow-lg shadow-amber-500/20 transition-all hover:scale-105 active:scale-95 shrink-0 flex items-center gap-2 z-10 cursor-pointer"
           >
-            <Sparkles size={16} className="text-brand-600" />
+            <Sparkles size={16} className="text-slate-950" />
             <span>Armar Mi Itinerario</span>
           </button>
         </div>
-      </section>
 
-      {/* Coastal Surf & Beaches Live Widget */}
-      <CoastalSurfWidget />
+        {/* Coastal Surf & Beaches Live Widget */}
+        <CoastalSurfWidget
+          onSelectBeach={(beachName) => {
+            const match = places.find(p => p.name.toLowerCase().includes(beachName.toLowerCase()));
+            if (match) {
+              handleRouteClick(match);
+            } else {
+              document.getElementById('mapa')?.scrollIntoView({ behavior: 'smooth' });
+            }
+          }}
+        />
+      </section>
 
       {/* Places Section */}
       <main className="max-w-6xl mx-auto px-6 py-12 sm:py-20" id="lugares">
