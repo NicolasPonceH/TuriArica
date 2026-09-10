@@ -1,104 +1,92 @@
-# TuriArica V2 🌸 - Plataforma Turística Inteligente de Arica
+# TuriArica V2 🌸
 
-Bienvenido a **TuriArica V2**, la plataforma web y aplicación móvil progresiva (PWA) de turismo interactivo para la ciudad de Arica, Chile ("La Ciudad de la Eterna Primavera").
+Bienvenido al rediseño premium de **TuriArica**, una aplicación web interactiva e inclusiva diseñada para mostrar los atractivos turísticos de la ciudad de Arica (la ciudad de la Eterna Primavera) sin barreras tecnológicas.
 
+## ✨ Características Principales
+
+* **Diseño "Brutal" y Premium**: Interfaz moderna basada en *Glassmorphism*, paletas vibrantes ("Eterna Primavera"), y tipografías hermosas (`Inter` / `Outfit`).
+* **Carrusel de Video Inmersivo**: El inicio de la aplicación cuenta con videos cinematográficos en alta calidad con transiciones suaves (crossfade) integrados con la temática de la ciudad.
+* **Mapa Interactivo 3D (MapLibre GL)**:
+* Motor WebGL a 60 FPS.
+* Perspectiva 3D con inclinación (*Pitch*) y rotación.
+* Rutas calculadas dinámicamente con efecto de neón.
+* **Turi-Asistente Inteligente**: Un chatbot flotante integrado para guiar al usuario a tomar decisiones sobre qué visitar.
+* **Accesibilidad Universal (A11y)**:
+* **Text-to-Speech (TTS)**: Botones para leer descripciones o la página entera en voz alta.
+* **Audios Reales**: Reproducción de descripciones en MP3 (con fallback a TTS).
+* **Panel de Ajustes Rápidos**: Modificación del tamaño del texto y un **Modo de Alto Contraste (Modo Oscuro)** dinámico y sin filtros destructivos.
+* **Transporte**: Integración de micros y líneas de transporte público para cada destino.
+
+## 📸 Vistazo a la Aplicación
+[![React](https://img.shields.io/badge/React_18-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://react.dev/)
+[![Vite](https://img.shields.io/badge/Vite_6-646CFF?style=for-the-badge&logo=vite&logoColor=white)](https://vitejs.dev/)
+[![TailwindCSS](https://img.shields.io/badge/Tailwind_CSS_v4-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
+[![MapLibre GL](https://img.shields.io/badge/MapLibre_GL-396FBF?style=for-the-badge&logo=maplibre&logoColor=white)](https://maplibre.org/)
+[![Framer Motion](https://img.shields.io/badge/Framer_Motion-0055FF?style=for-the-badge&logo=framer&logoColor=white)](https://www.framer.com/motion/)
+[![Lucide](https://img.shields.io/badge/Lucide_Icons-F05032?style=for-the-badge&logo=lucide&logoColor=white)](https://lucide.dev/)
+
+### Inicio Cinematográfico
+![Hero](/docs/hero.png)
+## 🛠 Tecnologías Utilizadas
+
+### Lugares y Modo Oscuro
+![Lugares](/docs/lugares.png)
+| Tecnología | Descripción | Insignia |
+| :--- | :--- | :--- |
+| **React 18** | Arquitectura modular de componentes y hooks reactivos | ![React](https://img.shields.io/badge/React-20232A?style=flat-square&logo=react&logoColor=61DAFB) |
+| **Vite 6** | Bundler y servidor de desarrollo HMR ultrarrápido | ![Vite](https://img.shields.io/badge/Vite-646CFF?style=flat-square&logo=vite&logoColor=white) |
+| **TailwindCSS v4** | Motor de estilos utilitarios modernos y modo oscuro | ![Tailwind](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=flat-square&logo=tailwind-css&logoColor=white) |
+| **MapLibre GL** | Motor cartográfico WebGL 3D a 60 FPS sin tokens | ![MapLibre](https://img.shields.io/badge/MapLibre-396FBF?style=flat-square&logo=maplibre&logoColor=white) |
+| **Framer Motion** | Animaciones fluidas, transiciones de scroll y micro-interacciones | ![Framer Motion](https://img.shields.io/badge/Framer_Motion-0055FF?style=flat-square&logo=framer&logoColor=white) |
+| **Lucide React** | Pack de iconografía vectorial limpia y coherente | ![Lucide](https://img.shields.io/badge/Lucide-F05032?style=flat-square&logo=lucide&logoColor=white) |
+| **GraphHopper API** | Cálculo de rutas y distancias en tiempo real | ![GraphHopper](https://img.shields.io/badge/GraphHopper-55B359?style=flat-square&logo=openstreetmap&logoColor=white) |
+| **Web Speech API** | Síntesis de voz (Text-to-Speech) nativa para accesibilidad universal | ![A11y](https://img.shields.io/badge/Web_Speech_API-A11y-purple?style=flat-square) |
+
+### Mapa Interactivo 3D (Rutas en Tiempo Real)
+![Mapa](/docs/mapa.png)
 ---
 
-## 🌟 Características Principales
+### Turi-Asistente
+![Asistente](/docs/asistente.png)
+## 📸 Vistazo a la Aplicación
 
-### 🗺️ Experiencia para Turistas y Visitantes
-* **Mapa Interactivo 3D (MapLibre GL)**: Motor WebGL a 60 FPS con perspectiva 3D, edificios, trazado de rutas en tiempo real con GraphHopper y paradas de locomoción colectiva.
-* **15+ Categorías Turísticas**: Playas, Museos, Monumentos Históricos, Gastronomía, Naturaleza, Miradores, Farmacias, Botillerías y Servicios 24h.
-* **Turi-Asistente Inteligente**: Chatbot turístico con contexto de la base de datos de Arica.
-* **Notificaciones & Popups Emergentes**: Alertas en vivo para eventos magnos (ej. *Carnaval Andino con la Fuerza del Sol*) y avisos preventivos de oleaje en playas.
-* **Widget Costero en Vivo**: Monitoreo de mareas, condiciones para surf (*El Gringo*, *Las Machas*) y estado de banderas en playas aptas para el baño (*El Laucho*, *Chinchorro*).
-* **Smart Itinerary Planner**: Generador de itinerarios turísticos a medida por día y estilo de viaje.
-* **Ruta Gastronómica Autóctona**: Especialidades culinarias de los Valles de Azapa, Lluta y Caleta Arica.
-* **Accesibilidad Universal (A11y)**: Text-to-Speech nativo, audios oficiales en MP3, modo alto contraste y tamaños de fuente adaptables.
-* **Instalable como App Móvil (PWA)**: Compatible con Android, iOS y Desktop con funcionamiento offline.
+## 🛠 Tecnologías Utilizadas
+### 🌟 Inicio Cinematográfico
+![Hero](./docs/hero.png)
 
----
+### 🌓 Lugares Turísticos y Modo Oscuro
+![Lugares](./docs/lugares.png)
 
-### 🛡️ Panel de Administración y Backoffice
-* **Credenciales Seguras**: Cuentas activas en SQLite con hash `bcrypt` y tokens `JWT` de 7 días.
-  - **Administrador Jorell** (`jorell` / `turiarica2026`)
-  - **Administrador Nicolás** (`nicolas` / `turiarica2026`)
-* **Dashboard Ejecutivo**: Métricas en tiempo real de lugares registrados, categorías, avisos activos y estadísticas de optimización.
-* **Gestor de Contenido Multimedia**:
-  - Subida de fotos con conversión y compresión automática al formato moderno **WebP** y miniaturas vía `sharp` (**~92% de ahorro en peso**).
-  - Subida de videos con streaming por rangos HTTP 206 (reproducción fluida en móviles).
-* **Gestor de Eventos & Avisos**: Creación y activación de notificaciones emergentes (popups) y avisos temporales para turistas.
-* **Base de Datos Persistente**: Motor relacional **SQLite 3** (`server/database/turiarica.db`) con seeds iniciales automáticos.
-* **Preparación para IA**: Endpoints `/api/ai/context`, `/api/ai/ask` y `/api/ai/dataset` para alimentar modelos LLM con conocimiento turístico de Arica.
+### 🗺️ Mapa Interactivo 3D (Rutas y Navegación)
+![Mapa](./docs/mapa.png)
 
----
+* **[React 18](https://react.dev/)**: Librería principal para la construcción de interfaces.
+* **[Vite](https://vitejs.dev/)**: Empaquetador ultra rápido.
+* **[TailwindCSS v4](https://tailwindcss.com/)**: Motor de estilos y diseño fluido.
+* **[Framer Motion](https://www.framer.com/motion/)**: Animaciones complejas y fluidas (scroll, micro-interacciones, físicas de rebote).
+* **[MapLibre GL](https://maplibre.org/) & react-map-gl**: Mapas interactivos en 3D libres de tokens.
+* **[Lucide React](https://lucide.dev/)**: Sistema de íconos consistente y moderno.
+* **[GraphHopper API](https://www.graphhopper.com/)**: Motor de enrutamiento para calcular distancias hacia los puntos turísticos.
+### 💬 Turi-Asistente Inteligente
+![Asistente](./docs/asistente.png)
 
-## 🛠️ Stack Tecnológico
+## 🚀 Instalación Local
 
-| Capa | Tecnologías |
-| :--- | :--- |
-| **Frontend** | React 18, Vite 6, TailwindCSS v4, MapLibre GL, Framer Motion, Lucide Icons, Vite PWA |
-| **Backend** | Node.js (v22+), Express, SQLite 3 (DatabaseSync nativo), JWT, Bcryptjs |
-| **Multimedia** | Sharp (WebP conversion & thumbnailing), Multer, HTML5 Video Streaming |
-| **APIs Externas** | GraphHopper (Routing en vivo), OpenStreetMap, Web Speech API |
+Si deseas correr este proyecto en tu máquina local:
 
----
-
-## 🚀 Ejecución en Entorno Local
-
-Para correr la plataforma completa en tu máquina:
-
-### 1. Iniciar el Backend (API, Base de Datos SQLite y Uploads)
-En una terminal:
+1. Clona el repositorio:
 ```bash
-npm run server
+git clone https://github.com/NicolasPonceH/TuriArica-V2.git
 ```
-*O con recarga en vivo:*
+2. Instala las dependencias:
 ```bash
-npm run server:dev
+npm install
 ```
-La API quedará escuchando en `http://localhost:5000/api`
-
-### 2. Iniciar el Frontend (Web Turística)
-En otra terminal:
+3. Ejecuta el entorno de desarrollo:
 ```bash
 npm run dev
 ```
-La web quedará disponible en `http://localhost:5173`
+4. Abre `http://localhost:5173` en tu navegador.
 
 ---
-
-## 🔐 Acceso al Panel de Administración
-
-1. Abre en tu navegador: [http://localhost:5173/#/admin](http://localhost:5173/#/admin) (o haz clic en el ícono de llave en el pie de página).
-2. Selecciona el usuario (**Jorell** o **Nicolás**).
-3. Ingresa la contraseña: `turiarica2026`.
-
----
-
-## 🌿 Estructura de Ramas Git para el Equipo
-
-El repositorio cuenta con ramas organizadas para el trabajo de 2 personas:
-
-- `main`: Rama de integración con la plataforma completa.
-- `frontend`: Rama dedicada al cliente React, componentes visuales y PWA (`src/`).
-- `backend`: Rama dedicada al servidor Express, base de datos y optimizador multimedia (`server/`).
-
-### Flujo de trabajo:
-```bash
-# Para trabajar en frontend:
-git checkout frontend
-# Realizar cambios en src/ y subir:
-git push origin frontend
-
-# Para trabajar en backend:
-git checkout backend
-# Realizar cambios en server/ y subir:
-git push origin backend
-
-# Para integrar en main:
-git checkout main
-git merge frontend
-git merge backend
-git push origin main
-```
+*Desarrollado con ❤️ para Arica, Chile.*
