@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Send, Bot, Sparkles, Key, Volume2, VolumeX, RotateCcw, Check, AlertCircle } from 'lucide-react';
+import { X, Send, Bot, Volume2, VolumeX, RotateCcw } from 'lucide-react';
 import { useLanguage } from '../../contexts/LanguageContext';
 
 const API_BASE = 'http://localhost:5000/api';
@@ -8,6 +8,7 @@ const API_BASE = 'http://localhost:5000/api';
 const QUICK_PROMPTS = [
   '🚌 ¿Qué micro me lleva a Playa El Laucho?',
   '🏛️ ¿Dónde están las momias Chinchorro?',
+  '🌤️ ¿Cómo está el clima hoy en Arica?',
   '🍽️ ¿Dónde probar comida típica en el Agro?',
   '🏄‍♂️ ¿Qué playas son aptas para surf o bodyboard?'
 ];
@@ -17,19 +18,13 @@ export default function AssistantModal({ onClose }) {
 
   const [messages, setMessages] = useState([
     {
-      text: '¡Hola! Soy tu asistente turístico oficial de Arica y Parinacota. Estoy alimentado con la información oficial de la ciudad y el modelo de inteligencia artificial **openai/gpt-oss-20b** a través de Groq Cloud.\n\n¿En qué te puedo asesorar hoy? (lugares, historia, playas, cómo llegar en micro o gastronomía)',
+      text: '¡Hola! Soy tu asistente turístico oficial de Arica y Parinacota. Estoy alimentado con la información oficial de la ciudad, estaciones meteorológicas en vivo y el modelo de inteligencia artificial **openai/gpt-oss-20b** a través de Groq Cloud.\n\n¿En qué te puedo asesorar hoy? (lugares, historia, playas, cómo llegar en micro, clima o gastronomía)',
       isBot: true
     }
   ]);
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [speakingIdx, setSpeakingIdx] = useState(null);
-
-  // Gestión de API Key de Groq
-  const [groqKey, setGroqKey] = useState(() => localStorage.getItem('turiarica_groq_key') || '');
-  const [showKeyConfig, setShowKeyConfig] = useState(false);
-  const [tempKey, setTempKey] = useState(groqKey);
-  const [keySavedMessage, setKeySavedMessage] = useState(false);
 
   const messagesEndRef = useRef(null);
 
@@ -40,32 +35,6 @@ export default function AssistantModal({ onClose }) {
   useEffect(() => {
     scrollToBottom();
   }, [messages, isTyping]);
-
-  // Guardar clave API
-  const handleSaveKey = async () => {
-    const cleanKey = tempKey.trim();
-    localStorage.setItem('turiarica_groq_key', cleanKey);
-    setGroqKey(cleanKey);
-
-    // Si tiene formato de Groq, notificar al backend también
-    if (cleanKey.startsWith('gsk_')) {
-      try {
-        await fetch(`${API_BASE}/ai/config`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ apiKey: cleanKey })
-        });
-      } catch {
-        // Ignorar si backend no está activo
-      }
-    }
-
-    setKeySavedMessage(true);
-    setTimeout(() => {
-      setKeySavedMessage(false);
-      setShowKeyConfig(false);
-    }, 1200);
-  };
 
   // Reproducir audio con Text-to-Speech
   const handleSpeak = (text, idx) => {
@@ -78,7 +47,7 @@ export default function AssistantModal({ onClose }) {
     }
 
     window.speechSynthesis.cancel();
-    // Limpiar markdown básico para locución
+    // Limpiar formato para locución
     const cleanText = text.replace(/[*#_`]/g, '').replace(/\[.*?\]/g, '');
     const utterance = new SpeechSynthesisUtterance(cleanText);
     utterance.lang = 'es-CL';
@@ -99,7 +68,6 @@ export default function AssistantModal({ onClose }) {
     setIsTyping(true);
 
     // Preparar mensaje bot vacío para streaming progresivo
-    const botIndex = messages.length + 1;
     setMessages(prev => [...prev, { text: '', isBot: true, isStreaming: true }]);
 
     try {
@@ -109,7 +77,6 @@ export default function AssistantModal({ onClose }) {
         body: JSON.stringify({
           question: query,
           stream: true,
-          groqApiKey: groqKey || undefined,
           model: 'openai/gpt-oss-20b'
         })
       });
@@ -171,14 +138,13 @@ export default function AssistantModal({ onClose }) {
       setIsTyping(false);
     } catch (err) {
       console.warn('[AI FALLBACK CLIENT]', err);
-      // Fallback a respuesta local inmediata si el backend no estuviese accesible
       setTimeout(() => {
         setMessages(prev => {
           const copy = [...prev];
           const last = copy[copy.length - 1];
           if (last && last.isBot) {
             last.isStreaming = false;
-            last.text = `⚠️ Error al conectar con el backend de IA (${err.message}). Por favor verifica que el servidor esté activo en el puerto 5000.`;
+            last.text = `⚠️ No se pudo conectar con el servidor de IA (${err.message}). Por favor verifica que el backend esté activo en el puerto 5000.`;
           }
           return copy;
         });
@@ -192,7 +158,7 @@ export default function AssistantModal({ onClose }) {
     setSpeakingIdx(null);
     setMessages([
       {
-        text: 'Conversación reiniciada. ¿Qué lugar o servicio de Arica te gustaría consultar?',
+        text: 'Conversación reiniciada. ¿Qué lugar, playa o servicio de Arica te gustaría consultar?',
         isBot: true
       }
     ]);
@@ -214,7 +180,7 @@ export default function AssistantModal({ onClose }) {
         onClick={e => e.stopPropagation()}
         className="bg-white w-full max-w-xl rounded-3xl overflow-hidden shadow-2xl flex flex-col h-[650px] max-h-[90vh] border border-sky-100 relative text-slate-800"
       >
-        {/* Header con paleta oficial */}
+        {/* Header con paleta oficial de la web */}
         <div className="bg-gradient-to-r from-sky-50 via-white to-amber-50/60 px-5 py-3.5 flex justify-between items-center border-b border-sky-100 z-10 sticky top-0">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-brand-500 to-sky-600 flex items-center justify-center text-white shadow-md shadow-brand-500/25">
@@ -229,23 +195,12 @@ export default function AssistantModal({ onClose }) {
               </div>
               <p className="text-xs text-slate-500 font-semibold flex items-center gap-1.5 mt-0.5">
                 <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                <span>Groq LPU Cloud · Conectado en tiempo real</span>
+                <span>Groq LPU Cloud · Conectado y listo</span>
               </p>
             </div>
           </div>
 
           <div className="flex items-center gap-1">
-            <button
-              onClick={() => setShowKeyConfig(!showKeyConfig)}
-              title="Configurar GROQ_API_KEY"
-              className={`p-2 rounded-xl border transition-all cursor-pointer ${
-                showKeyConfig || groqKey
-                  ? 'bg-amber-50 text-amber-700 border-amber-200'
-                  : 'bg-slate-100 hover:bg-slate-200 text-slate-600 border-slate-200'
-              }`}
-            >
-              <Key size={16} />
-            </button>
             <button
               onClick={resetChat}
               title="Reiniciar conversación"
@@ -261,44 +216,6 @@ export default function AssistantModal({ onClose }) {
             </button>
           </div>
         </div>
-
-        {/* Panel desplegable para ingresar la GROQ_API_KEY */}
-        <AnimatePresence>
-          {showKeyConfig && (
-            <motion.div
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: 'auto', opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              className="bg-amber-50/90 border-b border-amber-200 px-5 py-3 text-xs overflow-hidden"
-            >
-              <div className="flex items-center justify-between gap-2 mb-2 font-bold text-amber-900">
-                <div className="flex items-center gap-1.5">
-                  <Sparkles size={14} className="text-amber-600" />
-                  <span>Configuración de Groq API Key</span>
-                </div>
-                <span className="text-[10px] text-amber-700 font-normal">
-                  {groqKey ? '✅ Clave activa en sesión' : 'Opcional (Usa server/.env por defecto)'}
-                </span>
-              </div>
-              <div className="flex gap-2">
-                <input
-                  type="password"
-                  value={tempKey}
-                  onChange={e => setTempKey(e.target.value)}
-                  placeholder="gsk_..."
-                  className="flex-1 px-3 py-1.5 rounded-lg bg-white border border-amber-300 text-slate-800 text-xs outline-none focus:ring-2 focus:ring-brand-400"
-                />
-                <button
-                  onClick={handleSaveKey}
-                  className="px-3.5 py-1.5 bg-amber-500 hover:bg-amber-600 text-white font-black rounded-lg text-xs transition-colors flex items-center gap-1 cursor-pointer"
-                >
-                  {keySavedMessage ? <Check size={14} /> : null}
-                  <span>{keySavedMessage ? 'Guardado' : 'Aplicar'}</span>
-                </button>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
 
         {/* Chat Messages */}
         <div className="flex-1 p-5 overflow-y-auto flex flex-col gap-4 bg-slate-50/60">

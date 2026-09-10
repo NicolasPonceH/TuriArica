@@ -4,6 +4,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import Groq from 'groq-sdk';
 import { dbOperations } from '../db.js';
+import { getLiveWeather } from './weather.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -24,10 +25,26 @@ Reglas estrictas:
 6. Cuando des direcciones o cómo llegar, sé específico (nombre de paradas, líneas de micro, puntos de referencia) pero solo si están en el contexto.
 7. Si hay varios lugares que cumplen, enumera hasta 3 opciones como máximo, con nombre y una frase de por qué recomendarlos.`;
 
-// Función auxiliar para compilar el contexto oficial desde SQLite
-function buildOfficialContext() {
+// Función auxiliar para compilar el contexto oficial desde SQLite y RedMeteo
+async function buildOfficialContext() {
   const places = dbOperations.getAllPlaces();
   const events = dbOperations.getActiveEvents();
+
+  let weatherText = '';
+  try {
+    const weather = await getLiveWeather();
+    if (weather && weather.current) {
+      weatherText = `\n\n--- CONDICIÓN METEOROLÓGICA Y CLIMA EN TIEMPO REAL (ESTACIÓN CAPITANÍA DE PUERTO ARICA) ---
+- Temperatura actual: ${weather.current.temp}°C
+- Humedad relativa: ${weather.current.humidity}%
+- Viento actual: ${weather.current.windSpeedKmH} km/h (Dirección ${weather.current.windDirection})
+- Radiación solar: ${weather.current.solarRadiation !== null ? `${weather.current.solarRadiation} W/m²` : 'N/A'}
+- Índice de radiación UV: ${weather.current.uvIndex}
+- Fuente oficial: Red Meteorológica Aficionada de Chile (RedMeteo.cl), Estación ${weather.station.name} (${weather.station.code}).`;
+    }
+  } catch (e) {
+    // Si falla el clima, continuar sin interrumpir el contexto
+  }
 
   const placesContext = places.map(p => {
     const busLines = p.transport?.lineas?.length ? p.transport.lineas.join(', ') : 'No especificada';
@@ -52,16 +69,16 @@ function buildOfficialContext() {
   }).join('\n\n') : 'No hay alertas ni eventos especiales vigentes en este momento.';
 
   return {
-    text: `--- LUGARES TURÍSTICOS, PATRIMONIALES Y SERVICIOS EN ARICA ---\n${placesContext}\n\n--- EVENTOS Y AVISOS OFICIALES ---\n${eventsContext}`,
+    text: `--- LUGARES TURÍSTICOS, PATRIMONIALES Y SERVICIOS EN ARICA ---\n${placesContext}\n\n--- EVENTOS Y AVISOS OFICIALES ---\n${eventsContext}${weatherText}`,
     places,
     events
   };
 }
 
 // 1. Obtener contexto completo para alimentar una IA (RAG / System Prompt / Context Injection)
-router.get('/context', (req, res) => {
+router.get('/context', async (req, res) => {
   try {
-    const { text, places, events } = buildOfficialContext();
+    const { text, places, events } = await buildOfficialContext();
     res.json({
       systemPrompt: STRICT_SYSTEM_PROMPT,
       context: text,
@@ -89,7 +106,7 @@ router.post('/chat', async (req, res) => {
     }
 
     const apiKey = groqApiKey || process.env.GROQ_API_KEY;
-    const { text: contextText, places, events } = buildOfficialContext();
+    const { text: contextText, places, events } = await buildOfficialContext();
 
     // Si no hay API Key de Groq configurada, avisar y ofrecer respuesta de la base de datos
     if (!apiKey) {
