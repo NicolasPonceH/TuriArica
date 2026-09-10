@@ -4,8 +4,10 @@ const STORAGE_KEYS = {
   PLACES: 'turiarica_places',
   LANGUAGE: 'turiarica_language',
   ADMIN_AUTH: 'turiarica_admin_auth',
+  ADMIN_TOKEN: 'turiarica_admin_token',
   TRANSLATION_CACHE: 'turiarica_translations',
   FAVORITES: 'turiarica_favorites',
+  DISMISSED_POPUP: 'turiarica_dismissed_popup',
 };
 
 export function getStoredData(key) {

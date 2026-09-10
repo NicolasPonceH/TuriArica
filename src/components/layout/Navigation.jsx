@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { usePlaces } from '../../contexts/PlacesContext';
 import { SUPPORTED_LANGUAGES } from '../../utils/constants';
+import NotificationBell from '../shared/NotificationBell';
 
 export default function Navigation() {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -40,6 +41,9 @@ export default function Navigation() {
 
         {/* Right actions */}
         <div className="flex items-center gap-2">
+          {/* Notification Bell */}
+          <NotificationBell />
+
           {/* Search toggle */}
           <button
             onClick={() => { setSearchOpen(!searchOpen); setMobileOpen(false); setLangOpen(false); }}

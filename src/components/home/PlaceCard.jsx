@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import * as LucideIcons from 'lucide-react';
 import { useLanguage } from '../../contexts/LanguageContext';
+import { resolveMediaUrl } from '../../utils/constants';
 
 export default function PlaceCard({ place, onAudioClick, onRouteClick, onMoreClick }) {
   const IconComponent = LucideIcons[place.icon] || LucideIcons.MapPin;
@@ -22,7 +23,7 @@ export default function PlaceCard({ place, onAudioClick, onRouteClick, onMoreCli
         {/* Photo if available */}
         {place.photos && place.photos.length > 0 ? (
           <img
-            src={place.photos[0]}
+            src={resolveMediaUrl(place.photos[0])}
             alt={place.name}
             className="absolute inset-0 w-full h-full object-cover"
           />

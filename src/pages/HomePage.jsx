@@ -9,6 +9,7 @@ import AccessibilityToolbar from '../components/shared/AccessibilityToolbar';
 import AssistantModal from '../components/shared/AssistantModal';
 import PlaceDetailModal from '../components/shared/PlaceDetailModal';
 import PWAInstallPrompt from '../components/shared/PWAInstallPrompt';
+import EventPopupModal from '../components/shared/EventPopupModal';
 import { usePlaces } from '../contexts/PlacesContext';
 import { useLanguage } from '../contexts/LanguageContext';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -222,6 +223,9 @@ export default function HomePage() {
           />
         )}
       </AnimatePresence>
+
+      {/* Featured Event Popup Modal */}
+      <EventPopupModal />
     </div>
   );
 }

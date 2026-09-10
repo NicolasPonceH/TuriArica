@@ -5,6 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "server": "node --experimental-sqlite server/src/server.js",
+    "server:dev": "node --experimental-sqlite --watch server/src/server.js",
     "build": "vite build",
     "lint": "oxlint",
     "preview": "vite preview"
