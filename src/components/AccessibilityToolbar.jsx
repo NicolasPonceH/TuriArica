@@ -52,11 +52,11 @@ export default function AccessibilityToolbar({ onAssistantClick, onReadPageClick
               exit={{ opacity: 0, y: 20, scale: 0.88 }}
               transition={{ type: "spring", stiffness: 350, damping: 25 }}
               style={{ transformOrigin: "bottom right" }}
-              className="mb-3 w-[calc(100vw-2rem)] sm:w-80 max-w-[320px] bg-white/95 dark:bg-gray-900/95 backdrop-blur-2xl rounded-3xl shadow-[0_12px_45px_rgba(0,0,0,0.2)] border border-gray-100 dark:border-gray-800 p-4 sm:p-5 flex flex-col gap-4 text-gray-800 dark:text-gray-100"
+              className="mb-3 w-[calc(100vw-2rem)] sm:w-80 max-w-[320px] bg-white/98 backdrop-blur-2xl rounded-3xl shadow-[0_12px_45px_rgba(0,0,0,0.15)] border border-slate-200 p-4 sm:p-5 flex flex-col gap-4 text-slate-900 ring-1 ring-black/5"
             >
               {/* Header */}
-              <div className="flex items-center justify-between border-b border-gray-100 dark:border-gray-800 pb-3">
-                <h4 className="font-extrabold text-sm sm:text-base flex items-center gap-2 text-gray-900 dark:text-white">
+              <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                <h4 className="font-extrabold text-sm sm:text-base flex items-center gap-2 text-slate-900">
                   <span className="p-1.5 rounded-lg bg-accent-500/10 text-accent-500">
                     <Settings size={16} />
                   </span>
@@ -64,7 +64,7 @@ export default function AccessibilityToolbar({ onAssistantClick, onReadPageClick
                 </h4>
                 <button
                   onClick={() => setIsOpen(false)}
-                  className="p-1.5 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-400 hover:text-gray-600 transition-colors"
+                  className="p-1.5 rounded-full hover:bg-slate-100 text-slate-400 hover:text-slate-700 transition-colors"
                   aria-label="Cerrar ajustes"
                 >
                   <X size={16} />
@@ -73,23 +73,23 @@ export default function AccessibilityToolbar({ onAssistantClick, onReadPageClick
 
               {/* Tamaño de texto */}
               <div>
-                <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-1.5">
+                <p className="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">
                   Tamaño del Texto
                 </p>
-                <div className="flex items-center bg-gray-100 dark:bg-gray-800 rounded-2xl p-1 gap-1">
+                <div className="flex items-center bg-slate-100 rounded-2xl p-1 gap-1 border border-slate-200/60">
                   <button 
                     onClick={() => adjustText(-2)} 
-                    className="flex-1 py-2.5 flex justify-center items-center rounded-xl bg-white dark:bg-gray-700 shadow-sm hover:bg-gray-50 active:scale-95 text-gray-700 dark:text-gray-200 transition-all"
+                    className="flex-1 py-2.5 flex justify-center items-center rounded-xl bg-white shadow-xs hover:bg-slate-50 active:scale-95 text-slate-700 border border-slate-200/50 transition-all"
                     aria-label="Disminuir tamaño de texto"
                   >
                     <ZoomOut size={17} />
                   </button>
-                  <div className="flex-1 py-2 flex justify-center items-center font-black text-brand-600 dark:text-brand-400 text-sm">
+                  <div className="flex-1 py-2 flex justify-center items-center font-black text-sky-600 text-sm">
                     {fontSize}px
                   </div>
                   <button 
                     onClick={() => adjustText(2)} 
-                    className="flex-1 py-2.5 flex justify-center items-center rounded-xl bg-white dark:bg-gray-700 shadow-sm hover:bg-gray-50 active:scale-95 text-gray-700 dark:text-gray-200 transition-all"
+                    className="flex-1 py-2.5 flex justify-center items-center rounded-xl bg-white shadow-xs hover:bg-slate-50 active:scale-95 text-slate-700 border border-slate-200/50 transition-all"
                     aria-label="Aumentar tamaño de texto"
                   >
                     <ZoomIn size={17} />
@@ -101,9 +101,9 @@ export default function AccessibilityToolbar({ onAssistantClick, onReadPageClick
               <div className="grid grid-cols-2 gap-2">
                 <button 
                   onClick={toggleContrast} 
-                  className="flex flex-col items-center gap-1.5 p-3 bg-gray-50 dark:bg-gray-800/80 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-2xl transition-all border border-gray-100 dark:border-gray-700/60 active:scale-95 text-gray-700 dark:text-gray-200"
+                  className="flex flex-col items-center gap-1.5 p-3 bg-slate-50 hover:bg-slate-100 rounded-2xl transition-all border border-slate-200/80 active:scale-95 text-slate-800"
                 >
-                  <Moon size={18} className="text-brand-500" />
+                  <Moon size={18} className="text-sky-500" />
                   <span className="text-xs font-bold">Contraste</span>
                 </button>
                 <button 
@@ -111,7 +111,7 @@ export default function AccessibilityToolbar({ onAssistantClick, onReadPageClick
                     setIsOpen(false);
                     onReadPageClick && onReadPageClick();
                   }} 
-                  className="flex flex-col items-center gap-1.5 p-3 bg-gray-50 dark:bg-gray-800/80 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-2xl transition-all border border-gray-100 dark:border-gray-700/60 active:scale-95 text-gray-700 dark:text-gray-200"
+                  className="flex flex-col items-center gap-1.5 p-3 bg-slate-50 hover:bg-slate-100 rounded-2xl transition-all border border-slate-200/80 active:scale-95 text-slate-800"
                 >
                   <Volume2 size={18} className="text-accent-500" />
                   <span className="text-xs font-bold">Leer Pantalla</span>
@@ -124,7 +124,7 @@ export default function AccessibilityToolbar({ onAssistantClick, onReadPageClick
                   setIsOpen(false);
                   onAssistantClick && onAssistantClick();
                 }} 
-                className="w-full flex items-center justify-center gap-2 py-3 px-4 bg-gradient-to-r from-brand-500 to-accent-500 hover:from-brand-600 hover:to-accent-600 text-white rounded-2xl transition-all shadow-[0_4px_18px_rgba(14,165,233,0.35)] active:scale-98 font-extrabold text-sm"
+                className="w-full flex items-center justify-center gap-2 py-3 px-4 bg-gradient-to-r from-sky-500 to-accent-500 hover:from-sky-600 hover:to-accent-600 text-white rounded-2xl transition-all shadow-[0_4px_18px_rgba(14,165,233,0.35)] active:scale-98 font-extrabold text-sm"
               >
                 <Bot size={20} />
                 <span>Abrir Turi-Asistente</span>

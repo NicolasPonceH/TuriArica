@@ -50,7 +50,7 @@ export const places = [
     transport: { lineas: ["taxi", "auto"], direccion: "norte", letrero: "No hay micros", parada: "Solo vehículo particular" }
   },
   {
-    id: 6, icon: "Tent", name: "Cuevas de Anzota", category: "Naturaleza", lat: -18.5498, lng: -70.3312, color: "#6366F1",
+    id: 6, icon: "Compass", name: "Cuevas de Anzota", category: "Naturaleza", lat: -18.5498, lng: -70.3312, color: "#6366F1",
     image: "images/places/anzota.jpg",
     audioFile: "audios/CuevasDeAnzota_audio.mp3",
     shortDesc: "Sistema de grutas en acantilados, lobos marinos.",
@@ -80,7 +80,7 @@ export const places = [
     transport: { lineas: ["12", "14"], direccion: "norte", letrero: "Centro / Mall", parada: "España con Buenos Aires (luego caminar 1 cuadra)" }
   },
   {
-    id: 9, icon: "Activity", name: "Playa Las Machas", category: "Playa", lat: -18.4455, lng: -70.3038, color: "#0284C7",
+    id: 9, icon: "Waves", name: "Playa Las Machas", category: "Playa", lat: -18.4455, lng: -70.3038, color: "#0284C7",
     image: "images/places/machas.jpg",
     audioFile: "audios/machas_audios.mp3",
     shortDesc: "Playa de fuerte oleaje, el paraíso local del surf y bodyboard.",
@@ -100,7 +100,7 @@ export const places = [
     transport: { lineas: ["12", "14", "10", "8"], direccion: "sur", letrero: "Centro / Mall", parada: "Av. Comandante San Martín" }
   },
   {
-    id: 11, icon: "Map", name: "Ex Isla Alacrán", category: "Histórico", lat: -18.4803, lng: -70.3324, color: "#475569",
+    id: 11, icon: "Compass", name: "Ex Isla Alacrán", category: "Histórico", lat: -18.4803, lng: -70.3324, color: "#475569",
     image: "images/places/alacran.jpg",
     audioFile: "audios/alacran_audio.mp3",
     shortDesc: "Península histórica y sede de la famosa y peligrosa ola 'El Gringo'.",
@@ -120,7 +120,7 @@ export const places = [
     transport: { lineas: ["16", "8", "113", "12", "14"], direccion: "este", letrero: "18 de Septiembre / Estadio", parada: "Av. 18 de Septiembre" }
   },
   {
-    id: 13, icon: "Shell", name: "Museo del Mar", category: "Museo", lat: -18.4791, lng: -70.3193, color: "#3B82F6",
+    id: 13, icon: "Anchor", name: "Museo del Mar", category: "Museo", lat: -18.4791, lng: -70.3193, color: "#3B82F6",
     image: "images/places/museodelmar.jpg",
     audioFile: "audios/museodelmar_audio.mp3",
     shortDesc: "Increíble colección de caracolas, fósiles y especies marinas.",
