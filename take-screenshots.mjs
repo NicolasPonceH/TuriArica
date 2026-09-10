@@ -33,8 +33,11 @@ import fs from 'fs';
     await page.evaluate(() => document.getElementById('mapa').scrollIntoView());
     await page.waitForTimeout(2000); // Esperar a que carguen los tiles del mapa
     // Seleccionar un lugar en el mapa para mostrar el panel de locomoción
-    await page.selectOption('select', { index: 1 });
-    await page.waitForTimeout(1500);
+    await page.selectOption('select', '14'); // Paseo 21 de Mayo
+    await page.waitForTimeout(1000);
+    // Trazar ruta en el mapa
+    await page.click('text=Trazar Ruta');
+    await page.waitForTimeout(2500);
     await page.screenshot({ path: 'public/docs/mapa.png' });
 
     // Captura del Asistente

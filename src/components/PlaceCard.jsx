@@ -10,49 +10,69 @@ export default function PlaceCard({ place, onAudioClick, onRouteClick, onMoreCli
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-50px" }}
       whileHover={{ y: -5 }}
-      className="glass-panel rounded-2xl overflow-hidden flex flex-col h-full group bg-white shadow-lg hover:shadow-xl transition-shadow"
+      className="glass-panel rounded-2xl overflow-hidden flex flex-col h-full group bg-white shadow-md hover:shadow-2xl transition-all border border-gray-100"
     >
-      <div 
-        className="h-32 relative overflow-hidden flex items-center justify-center"
-        style={{ background: `linear-gradient(135deg, ${place.color}40, ${place.color}80)` }}
-      >
-        <span className="absolute top-3 left-3 px-3 py-1 bg-white/90 backdrop-blur-md rounded-full text-xs font-bold text-gray-800 shadow-sm">
+      {/* Real Place Photo with Category and Icon Overlay */}
+      <div className="h-44 sm:h-48 relative overflow-hidden bg-slate-900">
+        <img 
+          src={place.image} 
+          alt={place.name} 
+          className="w-full h-full object-cover group-hover:scale-108 transition-transform duration-500 ease-out"
+          loading="lazy"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/15 to-black/25 pointer-events-none" />
+
+        {/* Category Badge */}
+        <span className="absolute top-3 left-3 px-3 py-1 bg-white/95 backdrop-blur-md rounded-full text-xs font-bold text-gray-900 shadow-md border border-white/60">
           {place.category}
         </span>
-        <motion.div 
-          whileHover={{ scale: 1.2, rotate: 10 }}
-          className="p-4 bg-white/20 rounded-2xl backdrop-blur-sm border border-white/40 shadow-lg"
+
+        {/* Floating Brand Color Icon */}
+        <div 
+          className="absolute bottom-3 right-3 w-10 h-10 rounded-2xl backdrop-blur-md border border-white/50 shadow-lg flex items-center justify-center text-white transition-transform duration-300 group-hover:scale-110"
+          style={{ backgroundColor: `${place.color}f0` }}
         >
-          <IconComponent size={32} className="text-white" />
-        </motion.div>
+          <IconComponent size={20} />
+        </div>
       </div>
 
-      <div className="p-6 flex flex-col flex-grow">
-        <h3 className="text-xl font-bold mb-2 text-gray-900 group-hover:text-brand-600 transition-colors">
+      <div className="p-5 sm:p-6 flex flex-col flex-grow">
+        <h3 className="text-lg sm:text-xl font-extrabold mb-1.5 text-gray-900 group-hover:text-brand-600 transition-colors">
           {place.name}
         </h3>
-        <p className="text-gray-600 text-sm mb-6 flex-grow">
+
+        {/* Locomotion quick pill */}
+        {place.transport?.lineas && (
+          <div className="flex items-center gap-1.5 mb-2.5 text-[11px] font-semibold text-gray-500">
+            <LucideIcons.Bus size={13} className="text-accent-500 shrink-0" />
+            <span className="truncate">Micros: {place.transport.lineas.slice(0, 4).join(', ')}{place.transport.lineas.length > 4 ? '...' : ''}</span>
+          </div>
+        )}
+
+        <p className="text-gray-600 text-xs sm:text-sm mb-5 flex-grow line-clamp-2 leading-relaxed">
           {place.shortDesc}
         </p>
 
-        <div className="flex gap-2 mt-auto">
+        <div className="flex items-center gap-2 mt-auto pt-2 border-t border-gray-100">
           <button 
             onClick={() => onAudioClick(place)}
-            className="p-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-600 hover:text-brand-600 transition-colors"
+            className="p-2.5 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-600 hover:text-brand-600 transition-colors"
+            title={`Escuchar descripción de ${place.name}`}
             aria-label={`Escuchar descripción de ${place.name}`}
           >
             <LucideIcons.Volume2 size={18} />
           </button>
           <button 
             onClick={() => onRouteClick(place)}
-            className="p-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-600 hover:text-brand-600 transition-colors"
+            className="p-2.5 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-600 hover:text-brand-600 transition-colors"
+            title={`Cómo llegar a ${place.name}`}
             aria-label={`Cómo llegar a ${place.name}`}
           >
             <LucideIcons.Navigation size={18} />
           </button>
           <button 
             onClick={() => onMoreClick(place)}
-            className="flex-1 py-2 px-4 rounded-xl bg-brand-50 hover:bg-brand-100 text-brand-600 hover:text-brand-700 font-bold transition-colors border border-brand-100"
+            className="flex-1 py-2.5 px-4 rounded-xl bg-brand-50 hover:bg-brand-100 text-brand-600 hover:text-brand-700 font-bold text-xs sm:text-sm transition-colors border border-brand-100 text-center"
           >
             Ver más
           </button>
