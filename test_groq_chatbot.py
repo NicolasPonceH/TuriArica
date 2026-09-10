@@ -11,6 +11,13 @@ import json
 import urllib.request
 from groq import Groq
 
+if sys.platform == "win32":
+    try:
+        sys.stdout.reconfigure(encoding="utf-8")
+        sys.stderr.reconfigure(encoding="utf-8")
+    except Exception:
+        pass
+
 # 1. Configuración de API Key
 GROQ_API_KEY = os.environ.get("GROQ_API_KEY")
 if not GROQ_API_KEY:
@@ -44,6 +51,10 @@ def get_official_context():
         req = urllib.request.Request(url, headers={"User-Agent": "TuriArica-CLI/1.0"})
         with urllib.request.urlopen(req, timeout=3) as resp:
             data = json.loads(resp.read().decode("utf-8"))
+            if data.get("context"):
+                print(f"✅ Contexto completo obtenido del servidor backend ({len(data.get('places', []))} lugares, {len(data.get('events', []))} eventos y estación meteorológica en vivo).")
+                return data["context"]
+
             places = data.get("places", [])
             events = data.get("events", [])
             print(f"✅ Contexto obtenido del servidor backend: {len(places)} lugares y {len(events)} eventos.")
