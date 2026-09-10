@@ -84,13 +84,18 @@ db.exec(`
 // 2. Initial Seeding Function
 export function seedDatabase(adminUser = 'admin', adminPass = 'turiarica2026') {
   // A. Admin Seed
-  const adminCount = db.prepare('SELECT COUNT(*) as count FROM admins').get().count;
-  if (adminCount === 0) {
-    const hash = bcrypt.hashSync(adminPass, 10);
-    db.prepare('INSERT INTO admins (username, password_hash, role) VALUES (?, ?, ?)')
-      .run(adminUser, hash, 'superadmin');
-    console.log(`[DB] Usuario administrador inicial creado: ${adminUser}`);
+  const defaultAdmins = [
+    { username: 'jorell', role: 'administrador' },
+    { username: 'nicolas', role: 'administrador' },
+    { username: adminUser || 'admin', role: 'superadmin' }
+  ];
+
+  const hash = bcrypt.hashSync(adminPass, 10);
+  const insertAdmin = db.prepare('INSERT OR IGNORE INTO admins (username, password_hash, role) VALUES (?, ?, ?)');
+  for (const adm of defaultAdmins) {
+    insertAdmin.run(adm.username, hash, adm.role);
   }
+  console.log('[DB] Usuarios administradores verificados: jorell, nicolas, admin.');
 
   // B. Events Seed
   const eventCount = db.prepare('SELECT COUNT(*) as count FROM events').get().count;
