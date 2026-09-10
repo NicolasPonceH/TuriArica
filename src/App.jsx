@@ -164,21 +164,21 @@ function App() {
 
       {showAssistant && <AssistantModal onClose={() => setShowAssistant(false)} />}
 
-      <main className="max-w-6xl mx-auto px-6 py-24" id="lugares">
+      <main className="max-w-6xl mx-auto px-4 sm:px-6 py-14 sm:py-24" id="lugares">
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="mb-12"
+          className="mb-8 sm:mb-12"
         >
-          <h2 className="text-3xl md:text-5xl font-bold mb-8 text-gray-900">Lugares Turísticos</h2>
+          <h2 className="text-2xl sm:text-4xl md:text-5xl font-bold mb-4 sm:mb-8 text-gray-900">Lugares Turísticos</h2>
           
-          <div className="flex flex-wrap gap-3">
+          <div className="flex flex-wrap gap-2 sm:gap-3">
             {categories.map(cat => (
               <button
                 key={cat}
                 onClick={() => setActiveCategory(cat)}
-                className={`px-6 py-2 rounded-full font-medium transition-all ${
+                className={`px-4 py-1.5 sm:px-6 sm:py-2 rounded-full text-xs sm:text-sm font-semibold transition-all ${
                   activeCategory === cat 
                     ? 'bg-accent-500 text-white shadow-[0_0_15px_rgba(249,115,22,0.4)]' 
                     : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-50'
@@ -190,7 +190,7 @@ function App() {
           </div>
         </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           <AnimatePresence mode="popLayout">
             {filteredPlaces.map(place => (
               <PlaceCard 
@@ -205,17 +205,17 @@ function App() {
         </div>
       </main>
 
-      <section id="mapa" className="bg-white py-24 relative overflow-hidden border-t border-gray-100">
+      <section id="mapa" className="bg-white py-14 sm:py-24 relative overflow-hidden border-t border-gray-100">
         <div className="absolute inset-0 bg-gradient-to-b from-brand-50/50 to-transparent pointer-events-none" />
-        <div className="max-w-6xl mx-auto px-6 relative z-10">
+        <div className="max-w-6xl mx-auto px-3 sm:px-6 relative z-10">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="mb-12 text-center"
+            className="mb-8 sm:mb-12 text-center"
           >
-            <h2 className="text-3xl md:text-5xl font-bold mb-4 text-gray-900">Mapa Interactivo</h2>
-            <p className="text-gray-500 max-w-2xl mx-auto">Visualiza todos los puntos turísticos y calcula la ruta ("trazos") desde tu ubicación actual al destino de tu preferencia.</p>
+            <h2 className="text-2xl sm:text-4xl md:text-5xl font-bold mb-2 sm:mb-4 text-gray-900">Mapa Interactivo</h2>
+            <p className="text-xs sm:text-base text-gray-500 max-w-2xl mx-auto">Visualiza todos los puntos turísticos y calcula la ruta ("trazos") desde tu ubicación actual al destino de tu preferencia.</p>
           </motion.div>
 
           <InteractiveMap 
@@ -234,13 +234,13 @@ function App() {
         </div>
       </section>
 
-      <footer className="bg-surface-900 py-12 text-center border-t border-gray-200">
-        <div className="flex items-center justify-center gap-2 font-bold text-2xl text-gray-800 mb-4">
+      <footer className="bg-surface-900 py-10 sm:py-12 text-center border-t border-gray-200 px-4">
+        <div className="flex items-center justify-center gap-2 font-bold text-xl sm:text-2xl text-gray-800 mb-3 sm:mb-4">
           <LucideIcons.Mountain className="text-accent-500" />
           <span>TuriArica</span>
         </div>
-        <p className="text-gray-500 mb-6">Turismo accesible e inclusivo para todos. 🌸</p>
-        <div className="text-sm text-gray-400">
+        <p className="text-sm text-gray-500 mb-4 sm:mb-6">Turismo accesible e inclusivo para todos. 🌸</p>
+        <div className="text-xs sm:text-sm text-gray-400">
           Desarrollado con ❤️ para Arica, Chile · 2026
         </div>
       </footer>
@@ -252,29 +252,29 @@ function App() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[70] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm"
+            className="fixed inset-0 z-[70] flex items-center justify-center p-3 sm:p-4 bg-black/40 backdrop-blur-sm"
             onClick={() => setModalPlace(null)}
           >
             <motion.div 
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
-              className="bg-white rounded-3xl p-8 max-w-2xl w-full relative shadow-2xl max-h-[90vh] overflow-y-auto"
+              className="bg-white rounded-3xl p-5 sm:p-8 max-w-2xl w-full relative shadow-2xl max-h-[90vh] overflow-y-auto"
               onClick={e => e.stopPropagation()}
             >
               <button 
                 className="absolute top-4 right-4 p-2 rounded-full hover:bg-gray-100 text-gray-500"
                 onClick={() => setModalPlace(null)}
               >
-                <LucideIcons.X size={24} />
+                <LucideIcons.X size={20} />
               </button>
               
               <div className="mb-6">
-                <span className="inline-block px-3 py-1 bg-accent-50 text-accent-600 text-xs font-bold rounded-full mb-4 border border-accent-200">
+                <span className="inline-block px-3 py-1 bg-accent-50 text-accent-600 text-xs font-bold rounded-full mb-3 border border-accent-200">
                   {modalPlace.category}
                 </span>
-                <h2 className="text-3xl font-bold mb-4 text-gray-900">{modalPlace.name}</h2>
-                <p className="text-gray-600 leading-relaxed text-lg mb-6">{modalPlace.fullDesc}</p>
+                <h2 className="text-2xl sm:text-3xl font-bold mb-3 text-gray-900">{modalPlace.name}</h2>
+                <p className="text-gray-600 leading-relaxed text-sm sm:text-base mb-5">{modalPlace.fullDesc}</p>
                 
                 <div className="bg-gray-50 rounded-xl p-5 border border-gray-100 space-y-4">
                   <div className="flex gap-4 items-start">

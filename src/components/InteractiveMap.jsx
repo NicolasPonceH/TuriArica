@@ -304,9 +304,9 @@ export default function InteractiveMap({
   }, [selectedPlace, routeCoords, isMinimized]);
 
   return (
-    <div className="h-[80vh] w-full rounded-[2.5rem] overflow-hidden shadow-2xl border border-gray-200 dark:border-gray-800 relative z-10">
+    <div className="h-[72vh] sm:h-[80vh] min-h-[480px] w-full rounded-2xl sm:rounded-[2.5rem] overflow-hidden shadow-2xl border border-gray-200 dark:border-gray-800 relative z-10">
       {/* Floating Locomotion & Info Panel */}
-      <div className="absolute top-4 left-4 z-20 max-w-sm w-[92%] sm:w-84 pointer-events-auto">
+      <div className="absolute top-3 left-3 right-3 sm:right-auto z-20 sm:max-w-sm sm:w-84 pointer-events-auto">
         <AnimatePresence mode="wait">
           {selectedPlace ? (
             isMinimized ? (
@@ -315,7 +315,7 @@ export default function InteractiveMap({
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.9 }}
-                className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-md rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 p-3 flex items-center justify-between gap-3"
+                className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-md rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 p-2.5 sm:p-3 flex items-center justify-between gap-2 sm:gap-3"
               >
                 <div className="flex items-center gap-2 overflow-hidden">
                   <span className="w-3 h-3 rounded-full shrink-0" style={{ backgroundColor: selectedPlace.color }} />
@@ -354,7 +354,7 @@ export default function InteractiveMap({
                 initial={{ opacity: 0, y: -10, scale: 0.95 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, y: -10, scale: 0.95 }}
-                className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-md rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700 p-5 overflow-hidden max-h-[75vh] flex flex-col"
+                className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-md rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700 p-3.5 sm:p-5 overflow-hidden max-h-[62vh] sm:max-h-[75vh] flex flex-col"
               >
                 {/* Header */}
                 <div className="flex items-start justify-between gap-2 mb-3">
@@ -389,7 +389,7 @@ export default function InteractiveMap({
                 </div>
 
                 {/* Locomotion Section */}
-                <div className="bg-brand-50/70 dark:bg-gray-800/80 rounded-xl p-3.5 border border-brand-100 dark:border-gray-700 mb-3 space-y-2 overflow-y-auto">
+                <div className="bg-brand-50/70 dark:bg-gray-800/80 rounded-xl p-3 sm:p-3.5 border border-brand-100 dark:border-gray-700 mb-2.5 sm:mb-3 space-y-1.5 sm:space-y-2 overflow-y-auto max-h-[26vh] sm:max-h-[38vh]">
                   <div className="flex items-center gap-2 text-brand-700 dark:text-brand-300 font-bold text-xs uppercase tracking-wider">
                     <LucideIcons.Bus size={16} />
                     <span>Locomoción Colectiva</span>
