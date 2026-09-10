@@ -113,22 +113,27 @@ function App() {
       }
     }
 
-    if (!navigator.geolocation) {
-      // Fallback a Plaza Colón (Centro de Arica)
-      calculateForPosition(-18.4783, -70.3126)
-      return
-    }
+    // Calcular de inmediato desde la ubicación actual o Plaza Colón (Centro de Arica)
+    const initialLat = userLocation ? userLocation[1] : -18.4783;
+    const initialLng = userLocation ? userLocation[0] : -70.3126;
+    calculateForPosition(initialLat, initialLng);
 
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        calculateForPosition(pos.coords.latitude, pos.coords.longitude)
-      },
-      () => {
-        // Si no hay permisos o falla el GPS, usar Plaza Colón (Centro de Arica)
-        calculateForPosition(-18.4783, -70.3126)
-      },
-      { timeout: 6000 }
-    )
+    // En segundo plano, si el navegador tiene GPS activo, actualizar con la ubicación precisa
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          const newLat = pos.coords.latitude;
+          const newLng = pos.coords.longitude;
+          if (Math.abs(newLat - initialLat) > 0.0005 || Math.abs(newLng - initialLng) > 0.0005) {
+            calculateForPosition(newLat, newLng);
+          }
+        },
+        () => {
+          // GPS denegado o timeout: se mantiene la ruta de Plaza Colón
+        },
+        { timeout: 3500, maximumAge: 60000 }
+      );
+    }
   }
 
   const handleReadPage = () => {
