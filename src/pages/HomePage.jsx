@@ -151,22 +151,22 @@ export default function HomePage() {
       {/* Travel Hub Section (Itinerary Planner + Live Beach Conditions) */}
       <section className="max-w-6xl mx-auto px-4 sm:px-6 pt-12 sm:pt-16 pb-4 space-y-6">
         {/* Smart Itinerary Planner CTA Banner */}
-        <div className="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 rounded-3xl p-6 sm:p-7 text-white shadow-xl border border-indigo-900/40 flex flex-col sm:flex-row items-center justify-between gap-5 relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-80 h-full bg-gradient-to-l from-brand-500/10 to-transparent pointer-events-none" />
+        <div className="bg-gradient-to-r from-sky-50 via-white to-amber-50/60 rounded-3xl p-6 sm:p-7 shadow-xl shadow-sky-950/5 border border-sky-100 flex flex-col sm:flex-row items-center justify-between gap-5 relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-80 h-full bg-gradient-to-l from-amber-100/30 via-sky-100/20 to-transparent pointer-events-none" />
 
           <div className="flex items-center gap-4 text-center sm:text-left z-10">
-            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-brand-500 to-indigo-600 flex items-center justify-center shrink-0 shadow-lg shadow-brand-500/25">
-              <Compass size={24} className="text-white" />
+            <div className="w-13 h-13 rounded-2xl bg-gradient-to-br from-brand-500 to-sky-600 flex items-center justify-center shrink-0 shadow-lg shadow-brand-500/25 text-white">
+              <Compass size={26} />
             </div>
             <div>
-              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-brand-500/20 text-brand-300 text-[10px] font-bold uppercase tracking-wider mb-1 border border-brand-500/30">
-                <Sparkles size={11} />
-                <span>Asistente de Viaje</span>
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-sky-100/80 text-brand-600 text-[11px] font-bold uppercase tracking-wider mb-1.5 border border-sky-200">
+                <Sparkles size={12} className="text-accent-500" />
+                <span>Asistente de Viaje Inteligente</span>
               </div>
-              <h3 className="text-lg sm:text-xl font-black text-white leading-tight">
+              <h3 className="text-xl sm:text-2xl font-black text-slate-900 leading-tight">
                 ¿Planeando tu viaje a la Eterna Primavera?
               </h3>
-              <p className="text-xs sm:text-sm text-slate-300 mt-0.5">
+              <p className="text-xs sm:text-sm text-slate-600 mt-1 font-medium max-w-xl">
                 Genera un itinerario inteligente personalizado hora a hora según tus días y preferencias.
               </p>
             </div>
@@ -174,9 +174,9 @@ export default function HomePage() {
 
           <button
             onClick={() => setShowPlanner(true)}
-            className="px-6 py-3.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xs sm:text-sm shadow-lg shadow-amber-500/20 transition-all hover:scale-105 active:scale-95 shrink-0 flex items-center gap-2 z-10 cursor-pointer"
+            className="px-6 py-3.5 rounded-xl bg-gradient-to-r from-accent-500 to-amber-500 hover:from-accent-600 hover:to-amber-600 text-white font-black text-xs sm:text-sm shadow-lg shadow-orange-500/25 transition-all hover:scale-105 active:scale-95 shrink-0 flex items-center gap-2 z-10 cursor-pointer"
           >
-            <Sparkles size={16} className="text-slate-950" />
+            <Sparkles size={16} />
             <span>Armar Mi Itinerario</span>
           </button>
         </div>
