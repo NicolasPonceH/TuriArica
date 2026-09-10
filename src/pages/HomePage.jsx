@@ -10,11 +10,15 @@ import AssistantModal from '../components/shared/AssistantModal';
 import PlaceDetailModal from '../components/shared/PlaceDetailModal';
 import PWAInstallPrompt from '../components/shared/PWAInstallPrompt';
 import EventPopupModal from '../components/shared/EventPopupModal';
+import CoastalSurfWidget from '../components/home/CoastalSurfWidget';
+import GastronomyHighlights from '../components/home/GastronomyHighlights';
+import ItineraryPlannerModal from '../components/shared/ItineraryPlannerModal';
 import { usePlaces } from '../contexts/PlacesContext';
 import { useLanguage } from '../contexts/LanguageContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import { calculateHaversine } from '../utils/haversine';
 import { API, FALLBACK_LOCATION } from '../utils/constants';
+import { Sparkles, Compass } from 'lucide-react';
 
 export default function HomePage() {
   const { places, getPlacesByCategory, getPlacesByType } = usePlaces();
@@ -29,6 +33,7 @@ export default function HomePage() {
   const [userLocation, setUserLocation] = useState(null);
   const [modalPlace, setModalPlace] = useState(null);
   const [showAssistant, setShowAssistant] = useState(false);
+  const [showPlanner, setShowPlanner] = useState(false);
   const [currentAudio, setCurrentAudio] = useState(null);
 
   // Filter places by type first, then by category
@@ -101,22 +106,24 @@ export default function HomePage() {
       }
     };
 
-    if (!navigator.geolocation) {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          calculateForPosition(position.coords.latitude, position.coords.longitude);
+        },
+        () => {
+          calculateForPosition(FALLBACK_LOCATION.lat, FALLBACK_LOCATION.lng);
+        }
+      );
+    } else {
       calculateForPosition(FALLBACK_LOCATION.lat, FALLBACK_LOCATION.lng);
-      return;
     }
-
-    navigator.geolocation.getCurrentPosition(
-      (pos) => calculateForPosition(pos.coords.latitude, pos.coords.longitude),
-      () => calculateForPosition(FALLBACK_LOCATION.lat, FALLBACK_LOCATION.lng),
-      { timeout: 6000 }
-    );
   };
 
   const handleReadPage = () => {
     if ('speechSynthesis' in window) {
       window.speechSynthesis.cancel();
-      let texto = "Arica, ciudad de la eterna primavera. ";
+      let texto = 'Bienvenido a TuriArica. ';
       texto += `Mostrando ${filteredPlaces.length} lugares. `;
       filteredPlaces.forEach((p, i) => {
         texto += `${i + 1}: ${p.name}. `;
@@ -141,8 +148,38 @@ export default function HomePage() {
 
       {showAssistant && <AssistantModal onClose={() => setShowAssistant(false)} />}
 
+      {/* Smart Itinerary Planner CTA Banner */}
+      <section className="max-w-6xl mx-auto px-4 sm:px-6 -mt-6 sm:-mt-8 relative z-20">
+        <div className="bg-gradient-to-r from-brand-600 via-indigo-600 to-accent-600 rounded-2xl sm:rounded-3xl p-4 sm:p-6 text-white shadow-xl flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-3 text-center sm:text-left">
+            <div className="w-12 h-12 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center shrink-0 shadow-inner">
+              <Compass size={24} className="text-white" />
+            </div>
+            <div>
+              <h3 className="text-base sm:text-lg font-black leading-tight">
+                ¿Planeando tu viaje a Arica?
+              </h3>
+              <p className="text-xs sm:text-sm text-white/85">
+                Genera un itinerario inteligente por horas y según tus intereses.
+              </p>
+            </div>
+          </div>
+
+          <button
+            onClick={() => setShowPlanner(true)}
+            className="px-5 py-3 rounded-xl bg-white text-brand-700 hover:bg-slate-50 font-black text-xs sm:text-sm shadow-md transition-all hover:scale-105 shrink-0 flex items-center gap-2"
+          >
+            <Sparkles size={16} className="text-brand-600" />
+            <span>Armar Mi Itinerario</span>
+          </button>
+        </div>
+      </section>
+
+      {/* Coastal Surf & Beaches Live Widget */}
+      <CoastalSurfWidget />
+
       {/* Places Section */}
-      <main className="max-w-6xl mx-auto px-6 py-24" id="lugares">
+      <main className="max-w-6xl mx-auto px-6 py-12 sm:py-20" id="lugares">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -180,6 +217,9 @@ export default function HomePage() {
         )}
       </main>
 
+      {/* Gastronomy Highlights Section */}
+      <GastronomyHighlights />
+
       {/* Map Section */}
       <section id="mapa" className="bg-white py-24 relative overflow-hidden border-t border-gray-100">
         <div className="absolute inset-0 bg-gradient-to-b from-brand-50/50 to-transparent pointer-events-none" />
@@ -188,10 +228,10 @@ export default function HomePage() {
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="mb-12 text-center"
+            className="mb-8"
           >
             <h2 className="text-3xl md:text-5xl font-bold mb-4 text-gray-900">{t('map.title')}</h2>
-            <p className="text-gray-500 max-w-2xl mx-auto">{t('map.subtitle')}</p>
+            <p className="text-gray-500 text-lg">{t('map.subtitle')}</p>
           </motion.div>
 
           <InteractiveMap
@@ -223,6 +263,12 @@ export default function HomePage() {
           />
         )}
       </AnimatePresence>
+
+      {/* Smart Itinerary Planner Modal */}
+      <ItineraryPlannerModal
+        isOpen={showPlanner}
+        onClose={() => setShowPlanner(false)}
+      />
 
       {/* Featured Event Popup Modal */}
       <EventPopupModal />
