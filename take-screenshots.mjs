@@ -32,6 +32,9 @@ import fs from 'fs';
     console.log('Capturando Mapa...');
     await page.evaluate(() => document.getElementById('mapa').scrollIntoView());
     await page.waitForTimeout(2000); // Esperar a que carguen los tiles del mapa
+    // Seleccionar un lugar en el mapa para mostrar el panel de locomoción
+    await page.selectOption('select', { index: 1 });
+    await page.waitForTimeout(1500);
     await page.screenshot({ path: 'public/docs/mapa.png' });
 
     // Captura del Asistente
@@ -44,7 +47,15 @@ import fs from 'fs';
     await page.waitForTimeout(1000);
     await page.screenshot({ path: 'public/docs/asistente.png' });
 
-    console.log('Todas las capturas generadas en public/docs/');
+    if (!fs.existsSync('docs')) {
+      fs.mkdirSync('docs', { recursive: true });
+    }
+    fs.copyFileSync('public/docs/hero.png', 'docs/hero.png');
+    fs.copyFileSync('public/docs/lugares.png', 'docs/lugares.png');
+    fs.copyFileSync('public/docs/mapa.png', 'docs/mapa.png');
+    fs.copyFileSync('public/docs/asistente.png', 'docs/asistente.png');
+
+    console.log('Todas las capturas generadas y sincronizadas en docs/ y public/docs/');
   } catch (err) {
     console.error('Error durante la captura:', err);
   } finally {

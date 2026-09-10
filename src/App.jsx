@@ -16,11 +16,27 @@ function obtenerZona(lat, lng) {
   return "centro";
 }
 
+function calculateHaversine(lat1, lon1, lat2, lon2) {
+  const R = 6371; // km
+  const dLat = ((lat2 - lat1) * Math.PI) / 180;
+  const dLon = ((lon2 - lon1) * Math.PI) / 180;
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos((lat1 * Math.PI) / 180) *
+      Math.cos((lat2 * Math.PI) / 180) *
+      Math.sin(dLon / 2) *
+      Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c;
+}
+
 function App() {
   const [activeCategory, setActiveCategory] = useState('Todos')
   const [categories, setCategories] = useState([])
   const [routeCoords, setRouteCoords] = useState([])
   const [routeColor, setRouteColor] = useState('')
+  const [routeInfo, setRouteInfo] = useState(null)
+  const [selectedPlace, setSelectedPlace] = useState(null)
   const [userLocation, setUserLocation] = useState(null)
   const [modalPlace, setModalPlace] = useState(null)
   const [showAssistant, setShowAssistant] = useState(false)
@@ -54,15 +70,16 @@ function App() {
     }
   }
 
-  const handleRouteClick = (place) => {
-    if (!navigator.geolocation) {
-      alert("Tu navegador no soporta geolocalización.")
-      return
-    }
+  const handleClearRoute = () => {
+    setRouteCoords([])
+    setRouteColor('')
+    setRouteInfo(null)
+  }
 
-    navigator.geolocation.getCurrentPosition(async (pos) => {
-      const lat = pos.coords.latitude
-      const lng = pos.coords.longitude
+  const handleRouteClick = (place) => {
+    setSelectedPlace(place)
+
+    const calculateForPosition = async (lat, lng) => {
       setUserLocation([lng, lat])
 
       const API_KEY = "6817f243-eee4-4604-a1fa-8a73d219cbe6"
@@ -73,22 +90,45 @@ function App() {
         if (!res.ok) throw new Error()
         const data = await res.json()
         if (data.paths && data.paths.length > 0) {
-          // MapLibre usa [lng, lat], igual que GeoJSON nativo de GraphHopper
           const coords = data.paths[0].points.coordinates.map(c => [c[0], c[1]])
           setRouteCoords(coords)
           setRouteColor(place.color)
-          document.getElementById('mapa').scrollIntoView({ behavior: 'smooth' })
+          setRouteInfo({
+            distanceKm: (data.paths[0].distance / 1000).toFixed(1),
+            timeMin: Math.max(1, Math.round(data.paths[0].time / 60000))
+          })
+          document.getElementById('mapa')?.scrollIntoView({ behavior: 'smooth' })
         } else {
           throw new Error()
         }
       } catch (e) {
         setRouteCoords([[lng, lat], [place.lng, place.lat]])
         setRouteColor(place.color)
-        document.getElementById('mapa').scrollIntoView({ behavior: 'smooth' })
+        const dist = calculateHaversine(lat, lng, place.lat, place.lng)
+        setRouteInfo({
+          distanceKm: dist.toFixed(1),
+          timeMin: Math.max(1, Math.round((dist / 30) * 60))
+        })
+        document.getElementById('mapa')?.scrollIntoView({ behavior: 'smooth' })
       }
-    }, () => {
-      alert("No se pudo obtener tu ubicación.")
-    })
+    }
+
+    if (!navigator.geolocation) {
+      // Fallback a Plaza Colón (Centro de Arica)
+      calculateForPosition(-18.4783, -70.3126)
+      return
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        calculateForPosition(pos.coords.latitude, pos.coords.longitude)
+      },
+      () => {
+        // Si no hay permisos o falla el GPS, usar Plaza Colón (Centro de Arica)
+        calculateForPosition(-18.4783, -70.3126)
+      },
+      { timeout: 6000 }
+    )
   }
 
   const handleReadPage = () => {
@@ -179,6 +219,12 @@ function App() {
             routeCoords={routeCoords}
             routeColor={routeColor}
             userLocation={userLocation}
+            selectedPlace={selectedPlace}
+            setSelectedPlace={setSelectedPlace}
+            routeInfo={routeInfo}
+            onRouteClick={handleRouteClick}
+            onAudioClick={handleAudioClick}
+            onClearRoute={handleClearRoute}
           />
         </div>
       </section>
