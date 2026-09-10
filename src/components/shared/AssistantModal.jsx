@@ -1,170 +1,359 @@
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Send, Bot, User } from 'lucide-react';
-import { usePlaces } from '../../contexts/PlacesContext';
+import { X, Send, Bot, Sparkles, Key, Volume2, VolumeX, RotateCcw, Check, AlertCircle } from 'lucide-react';
 import { useLanguage } from '../../contexts/LanguageContext';
 
+const API_BASE = 'http://localhost:5000/api';
+
+const QUICK_PROMPTS = [
+  '🚌 ¿Qué micro me lleva a Playa El Laucho?',
+  '🏛️ ¿Dónde están las momias Chinchorro?',
+  '🍽️ ¿Dónde probar comida típica en el Agro?',
+  '🏄‍♂️ ¿Qué playas son aptas para surf o bodyboard?'
+];
+
 export default function AssistantModal({ onClose }) {
-  const { places } = usePlaces();
   const { t, language } = useLanguage();
 
   const [messages, setMessages] = useState([
-    { text: t('assistant.greeting'), isBot: true }
+    {
+      text: '¡Hola! Soy tu asistente turístico oficial de Arica y Parinacota. Estoy alimentado con la información oficial de la ciudad y el modelo de inteligencia artificial **openai/gpt-oss-20b** a través de Groq Cloud.\n\n¿En qué te puedo asesorar hoy? (lugares, historia, playas, cómo llegar en micro o gastronomía)',
+      isBot: true
+    }
   ]);
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
+  const [speakingIdx, setSpeakingIdx] = useState(null);
+
+  // Gestión de API Key de Groq
+  const [groqKey, setGroqKey] = useState(() => localStorage.getItem('turiarica_groq_key') || '');
+  const [showKeyConfig, setShowKeyConfig] = useState(false);
+  const [tempKey, setTempKey] = useState(groqKey);
+  const [keySavedMessage, setKeySavedMessage] = useState(false);
+
   const messagesEndRef = useRef(null);
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
   useEffect(() => {
     scrollToBottom();
   }, [messages, isTyping]);
 
-  // Build context from places for AI
-  const placesContext = places.map(p => `${p.name} (${p.category}): ${p.shortDesc}`).join('\n');
+  // Guardar clave API
+  const handleSaveKey = async () => {
+    const cleanKey = tempKey.trim();
+    localStorage.setItem('turiarica_groq_key', cleanKey);
+    setGroqKey(cleanKey);
 
-  const handleSend = async () => {
-    if (!input.trim()) return;
-    const userText = input;
-    setMessages(prev => [...prev, { text: userText, isBot: false }]);
+    // Si tiene formato de Groq, notificar al backend también
+    if (cleanKey.startsWith('gsk_')) {
+      try {
+        await fetch(`${API_BASE}/ai/config`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ apiKey: cleanKey })
+        });
+      } catch {
+        // Ignorar si backend no está activo
+      }
+    }
+
+    setKeySavedMessage(true);
+    setTimeout(() => {
+      setKeySavedMessage(false);
+      setShowKeyConfig(false);
+    }, 1200);
+  };
+
+  // Reproducir audio con Text-to-Speech
+  const handleSpeak = (text, idx) => {
+    if (!('speechSynthesis' in window)) return;
+
+    if (speakingIdx === idx) {
+      window.speechSynthesis.cancel();
+      setSpeakingIdx(null);
+      return;
+    }
+
+    window.speechSynthesis.cancel();
+    // Limpiar markdown básico para locución
+    const cleanText = text.replace(/[*#_`]/g, '').replace(/\[.*?\]/g, '');
+    const utterance = new SpeechSynthesisUtterance(cleanText);
+    utterance.lang = 'es-CL';
+    utterance.onend = () => setSpeakingIdx(null);
+    utterance.onerror = () => setSpeakingIdx(null);
+    setSpeakingIdx(idx);
+    window.speechSynthesis.speak(utterance);
+  };
+
+  // Enviar mensaje con Streaming SSE conectando a Groq en el Backend
+  const handleSend = async (textToSend) => {
+    const query = (textToSend || input).trim();
+    if (!query || isTyping) return;
+
+    // Agregar mensaje de usuario
+    setMessages(prev => [...prev, { text: query, isBot: false }]);
     setInput('');
     setIsTyping(true);
 
+    // Preparar mensaje bot vacío para streaming progresivo
+    const botIndex = messages.length + 1;
+    setMessages(prev => [...prev, { text: '', isBot: true, isStreaming: true }]);
+
     try {
-      // Try Puter.js AI first
-      if (typeof window !== 'undefined' && window.puter && window.puter.ai) {
-        const systemPrompt = `Eres "Turi-Asistente", un guía turístico amigable y experto de Arica, Chile.
-Responde siempre en ${language === 'es' ? 'español de Chile' : language === 'en' ? 'inglés' : language === 'pt' ? 'portugués' : 'español'}.
-Sé breve (máximo 3 oraciones) y entusiasta.
-Estos son los lugares disponibles en la app:
-${placesContext}
+      const res = await fetch(`${API_BASE}/ai/chat`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          question: query,
+          stream: true,
+          groqApiKey: groqKey || undefined,
+          model: 'openai/gpt-oss-20b'
+        })
+      });
 
-Si el usuario pregunta por algo que no está en la lista, sugiere algo similar o dile que pronto se agregarán más lugares.`;
+      if (!res.ok) {
+        throw new Error(`Servidor respondió con código ${res.status}`);
+      }
 
-        const response = await window.puter.ai.chat(userText, {
-          systemPrompt,
-        });
+      // Procesar SSE stream en tiempo real
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder('utf-8');
+      let accumulated = '';
 
-        const botText = typeof response === 'string' ? response : response?.message?.content || response?.text || 'Lo siento, no pude procesar tu pregunta.';
+      while (true) {
+        const { value, done } = await reader.read();
+        if (done) break;
 
-        setMessages(prev => [...prev, { text: botText, isBot: true }]);
-        setIsTyping(false);
+        const raw = decoder.decode(value, { stream: true });
+        const lines = raw.split('\n');
 
-        if ('speechSynthesis' in window) {
-          window.speechSynthesis.cancel();
-          const utterance = new SpeechSynthesisUtterance(botText);
-          utterance.lang = language === 'es' ? 'es-CL' : language === 'pt' ? 'pt-BR' : 'en-US';
-          window.speechSynthesis.speak(utterance);
+        for (const line of lines) {
+          if (line.startsWith('data: ')) {
+            const dataStr = line.slice(6).trim();
+            if (dataStr === '[DONE]') {
+              break;
+            }
+            try {
+              const parsed = JSON.parse(dataStr);
+              if (parsed.chunk) {
+                accumulated += parsed.chunk;
+                setMessages(prev => {
+                  const copy = [...prev];
+                  const last = copy[copy.length - 1];
+                  if (last && last.isBot) {
+                    last.text = accumulated;
+                  }
+                  return copy;
+                });
+              }
+            } catch {
+              // Fragmento no JSON, continuar
+            }
+          }
         }
-        return;
       }
-    } catch {
-      // Fall through to local fallback
-    }
 
-    // Local fallback (keyword matching)
-    setTimeout(() => {
-      let respuesta = "No estoy seguro de qué lugar recomendarte. Intenta con 'playas', 'museos', 'restaurantes' o 'naturaleza'.";
-      const q = userText.toLowerCase();
-      if (q.includes("playa")) respuesta = "¡Arica tiene playas para todos! El Laucho y La Lisera son como piscinas naturales perfectas para ir en familia.";
-      else if (q.includes("museo")) respuesta = "El Museo del Mar y el Museo de Sitio Colón 10 son opciones increíbles llenas de historia y cultura local.";
-      else if (q.includes("comer") || q.includes("comida") || q.includes("restaurante")) respuesta = "Para comer rico y fresco, el Terminal Agropecuario ASOCAPEC es el lugar ideal. ¡También puedes buscar restaurantes en el mapa!";
-      else if (q.includes("naturaleza")) respuesta = "El Humedal del Río Lluta es un santuario natural increíble para la observación de aves.";
-      else if (q.includes("farmacia")) respuesta = "Puedes buscar farmacias en el mapa interactivo activando la capa 'Farmacias'. El administrador puede agregar nuevas.";
-      else if (q.includes("hotel") || q.includes("alojamiento") || q.includes("dormir")) respuesta = "Revisa la sección de Alojamiento en el mapa para ver opciones de hospedaje en Arica.";
-      else if (q.includes("hola") || q.includes("hi") || q.includes("hello")) respuesta = "¡Hola! Bienvenido a Arica 🌸 ¿Qué te gustaría hacer hoy? Puedo recomendarte playas, museos, restaurantes o servicios.";
-
-      setMessages(prev => [...prev, { text: respuesta, isBot: true }]);
+      // Marcar streaming completado
+      setMessages(prev => {
+        const copy = [...prev];
+        const last = copy[copy.length - 1];
+        if (last && last.isBot) {
+          last.isStreaming = false;
+          if (!last.text) {
+            last.text = 'No tengo suficiente información para responder eso con certeza.';
+          }
+        }
+        return copy;
+      });
       setIsTyping(false);
+    } catch (err) {
+      console.warn('[AI FALLBACK CLIENT]', err);
+      // Fallback a respuesta local inmediata si el backend no estuviese accesible
+      setTimeout(() => {
+        setMessages(prev => {
+          const copy = [...prev];
+          const last = copy[copy.length - 1];
+          if (last && last.isBot) {
+            last.isStreaming = false;
+            last.text = `⚠️ Error al conectar con el backend de IA (${err.message}). Por favor verifica que el servidor esté activo en el puerto 5000.`;
+          }
+          return copy;
+        });
+        setIsTyping(false);
+      }, 500);
+    }
+  };
 
-      if ('speechSynthesis' in window) {
-        window.speechSynthesis.cancel();
-        const utterance = new SpeechSynthesisUtterance(respuesta);
-        utterance.lang = 'es-CL';
-        window.speechSynthesis.speak(utterance);
+  const resetChat = () => {
+    window.speechSynthesis?.cancel();
+    setSpeakingIdx(null);
+    setMessages([
+      {
+        text: 'Conversación reiniciada. ¿Qué lugar o servicio de Arica te gustaría consultar?',
+        isBot: true
       }
-    }, 1200);
+    ]);
   };
 
   return (
     <motion.div
-      initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-      className="fixed inset-0 z-[80] flex items-end sm:items-center justify-center p-4 sm:p-6 bg-black/40 backdrop-blur-sm"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="fixed inset-0 z-[80] flex items-end sm:items-center justify-center p-3 sm:p-6 bg-slate-950/50 backdrop-blur-sm"
       onClick={onClose}
     >
       <motion.div
         initial={{ y: 50, opacity: 0, scale: 0.95 }}
         animate={{ y: 0, opacity: 1, scale: 1 }}
         exit={{ y: 20, opacity: 0, scale: 0.95 }}
-        transition={{ type: "spring", damping: 25, stiffness: 300 }}
+        transition={{ type: "spring", damping: 26, stiffness: 320 }}
         onClick={e => e.stopPropagation()}
-        className="bg-surface-900 w-full max-w-lg rounded-[2rem] overflow-hidden shadow-[0_20px_60px_-15px_rgba(0,0,0,0.3)] flex flex-col h-[600px] max-h-[85vh] border border-white/50 relative"
+        className="bg-white w-full max-w-xl rounded-3xl overflow-hidden shadow-2xl flex flex-col h-[650px] max-h-[90vh] border border-sky-100 relative text-slate-800"
       >
-        {/* Header */}
-        <div className="bg-white/80 backdrop-blur-xl px-6 py-4 flex justify-between items-center border-b border-gray-100 z-10 sticky top-0">
+        {/* Header con paleta oficial */}
+        <div className="bg-gradient-to-r from-sky-50 via-white to-amber-50/60 px-5 py-3.5 flex justify-between items-center border-b border-sky-100 z-10 sticky top-0">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-brand-500 to-accent-500 flex items-center justify-center shadow-md">
-              <Bot size={20} className="text-white" />
+            <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-brand-500 to-sky-600 flex items-center justify-center text-white shadow-md shadow-brand-500/25">
+              <Bot size={22} />
             </div>
             <div>
-              <h3 className="font-extrabold text-lg text-gray-900 leading-tight">{t('assistant.title')}</h3>
-              <p className="text-xs text-brand-600 font-semibold flex items-center gap-1">
-                <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span> {t('assistant.online')}
+              <div className="flex items-center gap-2">
+                <h3 className="font-black text-base sm:text-lg text-slate-900 leading-tight">TuriArica AI</h3>
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-sky-100 text-brand-600 border border-sky-200">
+                  openai/gpt-oss-20b
+                </span>
+              </div>
+              <p className="text-xs text-slate-500 font-semibold flex items-center gap-1.5 mt-0.5">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                <span>Groq LPU Cloud · Conectado en tiempo real</span>
               </p>
             </div>
           </div>
-          <button
-            onClick={onClose}
-            className="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 text-gray-500 transition-colors"
-          >
-            <X size={18} />
-          </button>
+
+          <div className="flex items-center gap-1">
+            <button
+              onClick={() => setShowKeyConfig(!showKeyConfig)}
+              title="Configurar GROQ_API_KEY"
+              className={`p-2 rounded-xl border transition-all cursor-pointer ${
+                showKeyConfig || groqKey
+                  ? 'bg-amber-50 text-amber-700 border-amber-200'
+                  : 'bg-slate-100 hover:bg-slate-200 text-slate-600 border-slate-200'
+              }`}
+            >
+              <Key size={16} />
+            </button>
+            <button
+              onClick={resetChat}
+              title="Reiniciar conversación"
+              className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 border border-slate-200 transition-colors cursor-pointer"
+            >
+              <RotateCcw size={16} />
+            </button>
+            <button
+              onClick={onClose}
+              className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 border border-slate-200 transition-colors cursor-pointer"
+            >
+              <X size={18} />
+            </button>
+          </div>
         </div>
 
-        {/* Chat Area */}
-        <div className="flex-1 p-6 overflow-y-auto flex flex-col gap-5 bg-gradient-to-b from-gray-50 to-surface-900">
-          <AnimatePresence>
+        {/* Panel desplegable para ingresar la GROQ_API_KEY */}
+        <AnimatePresence>
+          {showKeyConfig && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              className="bg-amber-50/90 border-b border-amber-200 px-5 py-3 text-xs overflow-hidden"
+            >
+              <div className="flex items-center justify-between gap-2 mb-2 font-bold text-amber-900">
+                <div className="flex items-center gap-1.5">
+                  <Sparkles size={14} className="text-amber-600" />
+                  <span>Configuración de Groq API Key</span>
+                </div>
+                <span className="text-[10px] text-amber-700 font-normal">
+                  {groqKey ? '✅ Clave activa en sesión' : 'Opcional (Usa server/.env por defecto)'}
+                </span>
+              </div>
+              <div className="flex gap-2">
+                <input
+                  type="password"
+                  value={tempKey}
+                  onChange={e => setTempKey(e.target.value)}
+                  placeholder="gsk_..."
+                  className="flex-1 px-3 py-1.5 rounded-lg bg-white border border-amber-300 text-slate-800 text-xs outline-none focus:ring-2 focus:ring-brand-400"
+                />
+                <button
+                  onClick={handleSaveKey}
+                  className="px-3.5 py-1.5 bg-amber-500 hover:bg-amber-600 text-white font-black rounded-lg text-xs transition-colors flex items-center gap-1 cursor-pointer"
+                >
+                  {keySavedMessage ? <Check size={14} /> : null}
+                  <span>{keySavedMessage ? 'Guardado' : 'Aplicar'}</span>
+                </button>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Chat Messages */}
+        <div className="flex-1 p-5 overflow-y-auto flex flex-col gap-4 bg-slate-50/60">
+          <AnimatePresence initial={false}>
             {messages.map((m, i) => (
               <motion.div
                 key={i}
-                initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                initial={{ opacity: 0, y: 8, scale: 0.98 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
-                className={`flex gap-3 max-w-[85%] ${m.isBot ? 'self-start' : 'self-end flex-row-reverse'}`}
+                className={`flex gap-3 max-w-[88%] ${m.isBot ? 'self-start' : 'self-end flex-row-reverse'}`}
               >
                 {m.isBot && (
-                  <div className="w-8 h-8 shrink-0 rounded-full bg-white border border-gray-200 flex items-center justify-center shadow-sm mt-auto mb-1">
-                    <Bot size={16} className="text-brand-500" />
+                  <div className="w-8 h-8 shrink-0 rounded-xl bg-gradient-to-br from-brand-500 to-sky-600 flex items-center justify-center text-white shadow-sm mt-auto mb-1">
+                    <Bot size={16} />
                   </div>
                 )}
-                <div
-                  className={`p-4 text-[15px] leading-relaxed shadow-sm ${
-                    m.isBot
-                      ? 'bg-white border border-gray-100 text-gray-800 rounded-3xl rounded-bl-sm'
-                      : 'bg-gradient-to-br from-brand-500 to-brand-600 text-white rounded-3xl rounded-br-sm'
-                  }`}
-                >
-                  {m.text}
+                <div className="flex flex-col gap-1">
+                  <div
+                    className={`p-4 text-xs sm:text-sm leading-relaxed shadow-sm whitespace-pre-wrap ${
+                      m.isBot
+                        ? 'bg-white border border-slate-200/80 text-slate-800 rounded-2xl rounded-bl-sm font-medium'
+                        : 'bg-brand-500 text-white rounded-2xl rounded-br-sm font-semibold shadow-brand-500/20'
+                    }`}
+                  >
+                    {m.text || (m.isStreaming ? 'Pensando respuesta oficial...' : '')}
+                  </div>
+
+                  {m.isBot && m.text && !m.isStreaming && (
+                    <div className="flex items-center gap-2 px-1">
+                      <button
+                        onClick={() => handleSpeak(m.text, i)}
+                        className="text-[11px] text-slate-500 hover:text-brand-600 flex items-center gap-1 cursor-pointer transition-colors"
+                      >
+                        {speakingIdx === i ? <VolumeX size={13} className="text-red-500" /> : <Volume2 size={13} />}
+                        <span>{speakingIdx === i ? 'Detener voz' : 'Escuchar'}</span>
+                      </button>
+                    </div>
+                  )}
                 </div>
               </motion.div>
             ))}
 
-            {isTyping && (
+            {isTyping && messages[messages.length - 1]?.text === '' && (
               <motion.div
-                initial={{ opacity: 0, y: 10 }}
+                initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.9 }}
                 className="self-start flex gap-3 max-w-[85%]"
               >
-                <div className="w-8 h-8 shrink-0 rounded-full bg-white border border-gray-200 flex items-center justify-center shadow-sm mt-auto mb-1">
-                  <Bot size={16} className="text-brand-500" />
+                <div className="w-8 h-8 shrink-0 rounded-xl bg-brand-500 flex items-center justify-center text-white shadow-sm mt-auto mb-1">
+                  <Bot size={16} />
                 </div>
-                <div className="bg-white border border-gray-100 p-4 rounded-3xl rounded-bl-sm flex items-center gap-1 shadow-sm h-12">
-                  <motion.div className="w-2 h-2 bg-gray-400 rounded-full" animate={{ y: [0, -5, 0] }} transition={{ repeat: Infinity, duration: 0.6, delay: 0 }} />
-                  <motion.div className="w-2 h-2 bg-gray-400 rounded-full" animate={{ y: [0, -5, 0] }} transition={{ repeat: Infinity, duration: 0.6, delay: 0.2 }} />
-                  <motion.div className="w-2 h-2 bg-gray-400 rounded-full" animate={{ y: [0, -5, 0] }} transition={{ repeat: Infinity, duration: 0.6, delay: 0.4 }} />
+                <div className="bg-white border border-slate-200/80 p-3.5 rounded-2xl rounded-bl-sm flex items-center gap-1.5 shadow-sm h-10">
+                  <motion.div className="w-2 h-2 bg-brand-400 rounded-full" animate={{ y: [0, -4, 0] }} transition={{ repeat: Infinity, duration: 0.6, delay: 0 }} />
+                  <motion.div className="w-2 h-2 bg-brand-500 rounded-full" animate={{ y: [0, -4, 0] }} transition={{ repeat: Infinity, duration: 0.6, delay: 0.2 }} />
+                  <motion.div className="w-2 h-2 bg-brand-600 rounded-full" animate={{ y: [0, -4, 0] }} transition={{ repeat: Infinity, duration: 0.6, delay: 0.4 }} />
                 </div>
               </motion.div>
             )}
@@ -172,27 +361,42 @@ Si el usuario pregunta por algo que no está en la lista, sugiere algo similar o
           <div ref={messagesEndRef} />
         </div>
 
+        {/* Quick Prompts Bar */}
+        <div className="px-4 py-2 bg-white border-t border-slate-100 flex items-center gap-2 overflow-x-auto no-scrollbar">
+          <span className="text-[10px] font-black uppercase tracking-wider text-slate-400 shrink-0">Pruebas:</span>
+          {QUICK_PROMPTS.map((q, idx) => (
+            <button
+              key={idx}
+              onClick={() => handleSend(q)}
+              disabled={isTyping}
+              className="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-sky-50 text-sky-800 border border-sky-100 hover:bg-sky-100 hover:border-sky-200 whitespace-nowrap transition-colors shrink-0 cursor-pointer disabled:opacity-50"
+            >
+              {q}
+            </button>
+          ))}
+        </div>
+
         {/* Input Area */}
-        <div className="p-4 bg-white/80 backdrop-blur-xl border-t border-gray-100 pb-safe">
-          <div className="flex items-center gap-2 bg-gray-100 rounded-full p-1.5 pr-2 shadow-inner border border-gray-200 focus-within:border-brand-300 focus-within:ring-2 focus-within:ring-brand-100 transition-all">
+        <div className="p-3 sm:p-4 bg-white border-t border-slate-100 pb-safe">
+          <div className="flex items-center gap-2 bg-slate-50 rounded-2xl p-1.5 pr-2 border border-slate-200 focus-within:border-brand-400 focus-within:bg-white focus-within:ring-2 focus-within:ring-brand-100 transition-all">
             <input
               type="text"
               value={input}
               onChange={e => setInput(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && handleSend()}
-              placeholder={t('assistant.placeholder')}
-              className="flex-1 bg-transparent px-4 py-2 outline-none text-gray-800 placeholder-gray-400"
+              placeholder="Haz tu consulta sobre Arica (ej: ¿Cómo llegar al Morro en micro?)"
+              className="flex-1 bg-transparent px-3 py-2 outline-none text-slate-800 text-xs sm:text-sm placeholder-slate-400"
             />
             <button
-              onClick={handleSend}
+              onClick={() => handleSend()}
               disabled={!input.trim() || isTyping}
-              className={`p-3 rounded-full flex items-center justify-center transition-all ${
+              className={`p-2.5 sm:p-3 rounded-xl flex items-center justify-center transition-all cursor-pointer ${
                 input.trim() && !isTyping
-                  ? 'bg-accent-500 hover:bg-accent-600 text-white shadow-md'
-                  : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                  ? 'bg-gradient-to-r from-accent-500 to-amber-500 hover:from-accent-600 hover:to-amber-600 text-white shadow-md shadow-orange-500/20'
+                  : 'bg-slate-200 text-slate-400 cursor-not-allowed'
               }`}
             >
-              <Send size={18} className={input.trim() && !isTyping ? "ml-1" : ""} />
+              <Send size={16} />
             </button>
           </div>
         </div>
