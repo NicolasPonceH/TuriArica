@@ -48,6 +48,54 @@ export async function getLiveWeather() {
     const pressure = d.slp && d.slp.length > 0 ? Math.round(d.slp[0] * 10) / 10 : 1015;
     const precipToday = d.ppd && d.ppd.length > 0 ? d.ppd[0] : 0;
 
+    // Calcular condición climática precisa de Arica según hora local y sensores de RedMeteo
+    const aricaDate = new Date();
+    const timeParts = new Intl.DateTimeFormat('en-US', {
+      timeZone: 'America/Santiago',
+      hour: 'numeric',
+      minute: 'numeric',
+      hour12: false
+    }).formatToParts(aricaDate);
+
+    const aricaHour = parseInt(timeParts.find(p => p.type === 'hour')?.value || '12', 10);
+    const aricaMinute = parseInt(timeParts.find(p => p.type === 'minute')?.value || '0', 10);
+    const decimalHour = aricaHour + aricaMinute / 60;
+
+    const isNight = decimalHour >= 19.5 || decimalHour < 6.75;
+    const isSunset = decimalHour >= 18.25 && decimalHour < 19.5;
+
+    let condition = "Despejado";
+    let conditionType = "clear"; // 'clear' | 'partlyCloudy' | 'cloudy' | 'sunset' | 'night'
+    let conditionIcon = "Sun";
+    let conditionDesc = "Cielo despejado con sol costero";
+
+    if (isNight) {
+      condition = "Noche Despejada";
+      conditionType = "night";
+      conditionIcon = "Moon";
+      conditionDesc = "Noche tranquila con brisa marina";
+    } else if (isSunset) {
+      condition = "Atardecer";
+      conditionType = "sunset";
+      conditionIcon = "Sunset";
+      conditionDesc = "Atardecer dorado frente al mar";
+    } else if (solarRad !== null && solarRad < 180 && decimalHour >= 7.5 && decimalHour < 16.5) {
+      condition = "Nublado";
+      conditionType = "cloudy";
+      conditionIcon = "Cloud";
+      conditionDesc = "Nubosidad costera (camanchaca)";
+    } else if (solarRad !== null && solarRad < 380 && decimalHour >= 8.5 && decimalHour < 17.0) {
+      condition = "Parcial";
+      conditionType = "partlyCloudy";
+      conditionIcon = "CloudSun";
+      conditionDesc = "Sol y nubes dispersas";
+    } else {
+      condition = "Soleado";
+      conditionType = "clear";
+      conditionIcon = "Sun";
+      conditionDesc = "Sol radiante de Eterna Primavera";
+    }
+
     const data = {
       station: {
         code: 'RMCL0114',
@@ -60,6 +108,10 @@ export async function getLiveWeather() {
       },
       current: {
         temp: Number(temp.toFixed(1)),
+        condition,
+        conditionType,
+        conditionIcon,
+        conditionDesc,
         humidity: Math.round(humidity),
         windSpeedKmH,
         windDirection: degreesToCardinal(windDirDeg),
@@ -69,7 +121,7 @@ export async function getLiveWeather() {
         pressureHpa: pressure,
         rainTodayMm: precipToday
       },
-      citation: 'Red Meteorológica Aficionada de Chile. (2019). Sitio web RedMeteo. Red Ciudadana De Estaciones Meteorológicas. Consultado https://www.redmeteo.cl/',
+      citation: 'Red Meteorológica Aficionada de Chile. Estación Capitanía de Puerto (RedMeteo.cl)',
       cachedAt: new Date().toISOString()
     };
 
@@ -81,7 +133,6 @@ export async function getLiveWeather() {
     return data;
   } catch (err) {
     console.warn('[REDMETEO ERROR]', err.message);
-    // Si la estación de RedMeteo falla temporalmente, retornar último caché o valores de respaldo reales de Arica
     if (weatherCache.data) {
       return weatherCache.data;
     }
@@ -95,12 +146,16 @@ export async function getLiveWeather() {
         lastUpdate: new Date().toISOString()
       },
       current: {
-        temp: 22.0,
+        temp: 21.6,
+        condition: 'Despejado',
+        conditionType: 'clear',
+        conditionIcon: 'Sun',
+        conditionDesc: 'Cielo despejado con sol costero',
         humidity: 76,
         windSpeedKmH: 12.5,
-        windDirection: 'S',
+        windDirection: 'SW',
         solarRadiation: 350,
-        uvIndex: 7,
+        uvIndex: 2,
         pressureHpa: 1015.5,
         rainTodayMm: 0
       },
