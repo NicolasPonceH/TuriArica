@@ -242,7 +242,7 @@ export default function HomePage() {
         {/* Travel Hub Section (Itinerary Planner + Live Beach Conditions) */}
         <section className="max-w-6xl mx-auto px-4 sm:px-6 pt-12 sm:pt-16 pb-4 space-y-6">
           {/* Smart Itinerary Planner CTA Banner */}
-          <div className="bg-gradient-to-r from-sky-50 via-white to-amber-50/60 rounded-3xl p-6 sm:p-7 shadow-xl shadow-sky-950/5 border border-sky-100 flex flex-col sm:flex-row items-center justify-between gap-5 relative overflow-hidden">
+          <div className="glass-card rounded-3xl p-6 sm:p-7 shadow-xl shadow-sky-950/5 border border-white/80 flex flex-col sm:flex-row items-center justify-between gap-5 relative overflow-hidden backdrop-blur-xl">
             <div className="absolute top-0 right-0 w-80 h-full bg-gradient-to-l from-amber-100/30 via-sky-100/20 to-transparent pointer-events-none" />
 
             <div className="flex items-center gap-4 text-center sm:text-left z-10">

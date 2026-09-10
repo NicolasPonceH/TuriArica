@@ -177,7 +177,7 @@ export default function CoastalSurfWidget({
   };
 
   return (
-    <div className="bg-white rounded-3xl p-6 sm:p-8 shadow-xl border border-slate-200/80 text-slate-800 relative overflow-hidden">
+    <div className="glass-card rounded-3xl p-6 sm:p-8 shadow-xl border border-white/80 text-slate-800 relative overflow-hidden backdrop-blur-xl">
       {/* Header bar */}
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-5 pb-5 border-b border-slate-100">
         <div>
@@ -195,7 +195,7 @@ export default function CoastalSurfWidget({
 
         {/* Unified, Simple Horizontal Weather Capsule */}
         <div className="flex flex-col gap-2 shrink-0">
-          <div className="inline-flex items-center gap-3 px-4 py-2.5 rounded-2xl bg-slate-50/90 border border-slate-200/90 shadow-2xs text-slate-800">
+          <div className="inline-flex items-center gap-3 px-4 py-2.5 rounded-2xl glass-panel shadow-xs text-slate-800">
             {/* Weather Icon Badge */}
             <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 shadow-2xs ${visuals.iconBg}`}>
               <visuals.Icon size={22} />
@@ -347,7 +347,7 @@ export default function CoastalSurfWidget({
       </div>
 
       {/* Selected Beach Details Card */}
-      <div className="mt-5 bg-gradient-to-br from-sky-50/50 via-slate-50 to-white rounded-2xl p-5 sm:p-6 border border-sky-100 flex flex-col sm:flex-row sm:items-center justify-between gap-5 shadow-sm">
+      <div className="mt-5 glass-panel rounded-2xl p-5 sm:p-6 border border-white/70 flex flex-col sm:flex-row sm:items-center justify-between gap-5 shadow-sm">
         <div className="space-y-2 max-w-xl">
           <div className="flex items-center gap-3 flex-wrap">
             <h4 className="text-xl font-black text-slate-900">{current.name}</h4>

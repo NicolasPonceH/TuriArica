@@ -164,10 +164,10 @@ export default function AssistantModal({ onClose }) {
         exit={{ y: 20, opacity: 0, scale: 0.95 }}
         transition={{ type: "spring", damping: 26, stiffness: 320 }}
         onClick={e => e.stopPropagation()}
-        className="bg-white w-full max-w-xl rounded-3xl overflow-hidden shadow-2xl flex flex-col h-[650px] max-h-[90vh] border border-sky-100 relative text-slate-800"
+        className="glass-modal w-full max-w-xl rounded-3xl overflow-hidden shadow-2xl flex flex-col h-[650px] max-h-[90vh] border border-white/80 relative text-slate-800"
       >
         {/* Header oficial limpio sin mención a modelos de IA ni botón de reinicio */}
-        <div className="bg-gradient-to-r from-sky-50 via-white to-amber-50/60 px-5 py-3.5 flex justify-between items-center border-b border-sky-100 z-10 sticky top-0">
+        <div className="glass-panel px-5 py-3.5 flex justify-between items-center border-b border-white/60 z-10 sticky top-0">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-brand-500 to-sky-600 flex items-center justify-center text-white shadow-md shadow-brand-500/25">
               <Bot size={22} />
@@ -271,8 +271,8 @@ export default function AssistantModal({ onClose }) {
         </div>
 
         {/* Input Area */}
-        <div className="p-3 sm:p-4 bg-white border-t border-slate-100 pb-safe">
-          <div className="flex items-center gap-2 bg-slate-50 rounded-2xl p-1.5 pr-2 border border-slate-200 focus-within:border-brand-400 focus-within:bg-white focus-within:ring-2 focus-within:ring-brand-100 transition-all">
+        <div className="p-3 sm:p-4 glass-panel border-t border-white/60 pb-safe">
+          <div className="flex items-center gap-2 glass-pill rounded-2xl p-1.5 pr-2 border border-slate-200/80 focus-within:border-brand-400 focus-within:bg-white focus-within:ring-2 focus-within:ring-brand-100 transition-all">
             <input
               type="text"
               value={input}
