@@ -1,133 +1,63 @@
-# 🌴 TuriArica
+# TuriArica V2 🌸
 
-> Plataforma web orientada a promover el turismo en la ciudad de Arica mediante una experiencia interactiva, accesible y responsiva.
+Bienvenido al rediseño premium de **TuriArica**, una aplicación web interactiva e inclusiva diseñada para mostrar los atractivos turísticos de la ciudad de Arica (la ciudad de la Eterna Primavera) sin barreras tecnológicas.
 
-## 📖 Descripción
+## ✨ Características Principales
 
-**TuriArica** es una aplicación web desarrollada con tecnologías Frontend que permite a turistas y habitantes explorar distintos atractivos turísticos de Arica.
+* **Diseño "Brutal" y Premium**: Interfaz moderna basada en *Glassmorphism*, paletas vibrantes ("Eterna Primavera"), y tipografías hermosas (`Inter` / `Outfit`).
+* **Carrusel de Video Inmersivo**: El inicio de la aplicación cuenta con videos cinematográficos en alta calidad con transiciones suaves (crossfade) integrados con la temática de la ciudad.
+* **Mapa Interactivo 3D (MapLibre GL)**:
+  * Motor WebGL a 60 FPS.
+  * Perspectiva 3D con inclinación (*Pitch*) y rotación.
+  * Rutas calculadas dinámicamente con efecto de neón.
+* **Turi-Asistente Inteligente**: Un chatbot flotante integrado para guiar al usuario a tomar decisiones sobre qué visitar.
+* **Accesibilidad Universal (A11y)**:
+  * **Text-to-Speech (TTS)**: Botones para leer descripciones o la página entera en voz alta.
+  * **Audios Reales**: Reproducción de descripciones en MP3 (con fallback a TTS).
+  * **Panel de Ajustes Rápidos**: Modificación del tamaño del texto y un **Modo de Alto Contraste (Modo Oscuro)** dinámico y sin filtros destructivos.
+  * **Transporte**: Integración de micros y líneas de transporte público para cada destino.
 
-El proyecto fue diseñado priorizando la **accesibilidad**, la **usabilidad** y una experiencia de navegación intuitiva, incorporando herramientas como lectura por voz, alto contraste y diseño adaptable para distintos dispositivos.
+## 📸 Vistazo a la Aplicación
 
----
+### Inicio Cinematográfico
+![Hero](/docs/hero.png)
 
-## ✨ Características
+### Lugares y Modo Oscuro
+![Lugares](/docs/lugares.png)
 
-* 🏝️ Catálogo de lugares turísticos.
-* 🗺️ Visualización mediante mapa interactivo.
-* 🔎 Filtro de categorías.
-* 📱 Diseño responsive.
-* ♿ Modo de alto contraste.
-* 🔊 Lectura de información mediante síntesis de voz.
-* 🧭 Navegación intuitiva.
-* 🎨 Interfaz moderna.
+### Mapa Interactivo 3D (Rutas en Tiempo Real)
+![Mapa](/docs/mapa.png)
 
----
+### Turi-Asistente
+![Asistente](/docs/asistente.png)
 
-## 🛠 Tecnologías utilizadas
+## 🛠 Tecnologías Utilizadas
 
-### Desarrollo
+* **[React 18](https://react.dev/)**: Librería principal para la construcción de interfaces.
+* **[Vite](https://vitejs.dev/)**: Empaquetador ultra rápido.
+* **[TailwindCSS v4](https://tailwindcss.com/)**: Motor de estilos y diseño fluido.
+* **[Framer Motion](https://www.framer.com/motion/)**: Animaciones complejas y fluidas (scroll, micro-interacciones, físicas de rebote).
+* **[MapLibre GL](https://maplibre.org/) & react-map-gl**: Mapas interactivos en 3D libres de tokens.
+* **[Lucide React](https://lucide.dev/)**: Sistema de íconos consistente y moderno.
+* **[GraphHopper API](https://www.graphhopper.com/)**: Motor de enrutamiento para calcular distancias hacia los puntos turísticos.
 
-* HTML5
-* CSS3
-* JavaScript (ES6)
+## 🚀 Instalación Local
 
-### Diseño
+Si deseas correr este proyecto en tu máquina local:
 
-* CSS Variables
-* Flexbox
-* CSS Grid
-* Animaciones CSS
-* Responsive Design
-
-### Mapas
-
-* Leaflet.js
-
-### Accesibilidad
-
-* Web Speech API
-* Alto contraste
-* Navegación mediante teclado
-* Focus visible
-* Diseño inclusivo
-
-### Herramientas
-
-* Visual Studio Code
-* Git
-* GitHub
-
----
-
-## 📂 Estructura del proyecto
-
-```text
-TuriArica/
-│
-├── assets/
-│   ├── css/
-│   ├── js/
-│   ├── images/
-│
-├── index.html
-├── style.css
-└── README.md
-```
+1. Clona el repositorio:
+   ```bash
+   git clone https://github.com/NicolasPonceH/TuriArica-V2.git
+   ```
+2. Instala las dependencias:
+   ```bash
+   npm install
+   ```
+3. Ejecuta el entorno de desarrollo:
+   ```bash
+   npm run dev
+   ```
+4. Abre `http://localhost:5173` en tu navegador.
 
 ---
-
-## 🚀 Instalación
-
-Clonar el repositorio:
-
-```bash
-git clone https://github.com/NicolasPonceH/TuriArica.git
-```
-
-Ingresar al proyecto:
-
-```bash
-cd TuriArica
-```
-
-Abrir el archivo `index.html` en cualquier navegador moderno.
-
-No requiere instalación de dependencias ni servidor backend.
-
----
-
-## 🎯 Objetivos del proyecto
-
-* Promover el turismo en la ciudad de Arica.
-* Facilitar el acceso a información turística.
-* Mejorar la experiencia del usuario mediante herramientas de accesibilidad.
-* Aplicar buenas prácticas de desarrollo Frontend.
-
----
-
-## ♿ Accesibilidad
-
-El proyecto incorpora funcionalidades orientadas a mejorar la experiencia de todos los usuarios, incluyendo:
-
-* Modo de alto contraste.
-* Lectura por voz del contenido.
-* Navegación mediante teclado.
-* Elementos con foco visible.
-* Diseño adaptable para diferentes tamaños de pantalla.
-
----
-
-## 👨‍💻 Autor
-
-**Nicolás Benjamín Ponce Hernández**
-
-Estudiante de Ingeniería en Informática
-
-GitHub:
-**https://github.com/NicolasPonceH**
-
----
-
-## 📄 Licencia
-
-Proyecto desarrollado con fines académicos y educativos.
+*Desarrollado con ❤️ para Arica, Chile.*

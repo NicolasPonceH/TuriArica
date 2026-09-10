@@ -1,0 +1,93 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", "Outfit", system-ui, sans-serif;
+  
+  --color-brand-500: #0ea5e9; /* Sky Blue (Océano) */
+  --color-brand-600: #0284c7;
+  
+  --color-accent-500: #f97316; /* Orange (Atardecer/Primavera) */
+  --color-accent-600: #ea580c;
+  
+  --color-surface-900: #fdfbf7; /* Light Sand / Blanco hueso */
+  --color-surface-800: #ffffff; /* Blanco puro */
+  --color-surface-700: #f1f5f9; /* Slate 100 */
+  
+  --color-text-primary: #1e293b; /* Slate 800 */
+  --color-text-secondary: #475569; /* Slate 600 */
+}
+
+@layer base {
+  :root {
+    font-family: var(--font-sans);
+    background-color: var(--color-surface-900);
+    color: var(--color-text-primary);
+    scroll-behavior: smooth;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+  
+  body {
+    margin: 0;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden;
+  }
+
+  /* Dark Mode / High Contrast Optimization */
+  body.high-contrast {
+    background-color: #0f172a !important; /* Dark Slate */
+    color: #f8fafc !important;
+  }
+  
+  /* Override light backgrounds automatically in Dark Mode */
+  body.high-contrast .bg-white,
+  body.high-contrast .bg-white\/90,
+  body.high-contrast .bg-white\/95,
+  body.high-contrast .bg-gray-50,
+  body.high-contrast .bg-gray-100 {
+    background-color: #1e293b !important;
+    border-color: #334155 !important;
+  }
+
+  /* Override dark texts to light in Dark Mode */
+  body.high-contrast .text-gray-900,
+  body.high-contrast .text-gray-800,
+  body.high-contrast .text-gray-700,
+  body.high-contrast .text-gray-600,
+  body.high-contrast .text-gray-500 {
+    color: #e2e8f0 !important;
+  }
+
+  /* Custom overrides for specific elements in Dark Mode */
+  body.high-contrast .glass-panel {
+    background-color: rgba(30, 41, 59, 0.8) !important;
+    border-color: rgba(255, 255, 255, 0.1) !important;
+  }
+  
+  body.high-contrast h1, 
+  body.high-contrast h2, 
+  body.high-contrast h3, 
+  body.high-contrast h4 {
+    color: #ffffff !important;
+  }
+}
+
+@layer utilities {
+  .glass-panel {
+    @apply bg-white/80 backdrop-blur-md border border-gray-200 shadow-xl;
+  }
+  
+  .text-gradient {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-accent-500 to-brand-500;
+  }
+}
+
+@layer utilities {
+  .glass-panel {
+    @apply bg-white/80 backdrop-blur-md border border-gray-200 shadow-xl;
+  }
+  
+  .text-gradient {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-accent-500 to-brand-500;
+  }
+}
