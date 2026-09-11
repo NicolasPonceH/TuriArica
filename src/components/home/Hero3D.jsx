@@ -1,17 +1,39 @@
-import { useState, useEffect } from 'react';
+import { useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-const HERO_VIDEO = "https://res.cloudinary.com/dirgawanf/video/upload/v1789146026/202609111345_jzwgh2.mp4";
+const HERO_VIDEO = "https://res.cloudinary.com/dirgawanf/video/upload/q_auto/v1789146026/202609111345_jzwgh2.mp4";
+const HERO_POSTER = "https://res.cloudinary.com/dirgawanf/video/upload/so_0,q_auto,w_1920/v1789146026/202609111345_jzwgh2.jpg";
 
 function VideoBackground() {
+  const videoRef = useRef(null);
+
+  const handleTimeUpdate = () => {
+    const video = videoRef.current;
+    if (!video || !video.duration) return;
+    // Se corta exactamente 1 segundo antes de terminar y vuelve al inicio en bucle infinito
+    if (video.currentTime >= video.duration - 1) {
+      video.currentTime = 0;
+      video.play().catch(() => {});
+    }
+  };
+
   return (
     <div className="absolute inset-0 z-0 overflow-hidden bg-black">
       <video
+        ref={videoRef}
         src={HERO_VIDEO}
+        poster={HERO_POSTER}
         autoPlay
         muted
-        loop
         playsInline
+        preload="auto"
+        onTimeUpdate={handleTimeUpdate}
+        onEnded={() => {
+          if (videoRef.current) {
+            videoRef.current.currentTime = 0;
+            videoRef.current.play().catch(() => {});
+          }
+        }}
         className="absolute inset-0 w-full h-full object-cover"
       />
       {/* Overlay oscuro muy sutil para que resalten los colores reales del video pero el texto blanco se lea */}

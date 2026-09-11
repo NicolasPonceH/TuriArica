@@ -13,8 +13,8 @@ const DEFAULT_EVENTS = [
     type: 'festival',
     startDate: '2026-01-23',
     endDate: '2026-02-15',
-    isActive: true,
-    isPopup: true,
+    isActive: false,
+    isPopup: false,
     bannerUrl: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=800&auto=format&fit=crop',
     actionUrl: 'https://aricafuerzadelsol.cl',
     priority: 1
@@ -56,11 +56,13 @@ export function EventsProvider({ children }) {
 
     // Fallback
     setActiveEvents(DEFAULT_EVENTS);
-    const popup = DEFAULT_EVENTS[0];
-    const dismissedDate = getStoredData(`${STORAGE_KEYS.DISMISSED_POPUP}_${popup.id}`);
     const today = new Date().toISOString().split('T')[0];
-    if (dismissedDate !== today) {
-      setFeaturedPopup(popup);
+    const popup = DEFAULT_EVENTS.find(e => e.isPopup && e.isActive && (!e.endDate || e.endDate >= today));
+    if (popup) {
+      const dismissedDate = getStoredData(`${STORAGE_KEYS.DISMISSED_POPUP}_${popup.id}`);
+      if (dismissedDate !== today) {
+        setFeaturedPopup(popup);
+      }
     }
   }, []);
 
