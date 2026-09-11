@@ -14,8 +14,12 @@ import aiRouter from './routes/ai.js';
 import weatherRouter from './routes/weather.js';
 import healthRouter from './routes/health.js';
 
+import dotenv from 'dotenv';
+dotenv.config();
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+dotenv.config({ path: path.resolve(__dirname, '../.env') });
 
 const app = express();
 const PORT = process.env.PORT || 5000;
