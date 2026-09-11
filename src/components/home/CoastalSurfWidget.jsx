@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Waves, Sun, Cloud, CloudSun, Sunset, Moon, ShieldAlert, Wind, ChevronRight, Droplets, Sparkles } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { API_BASE_URL } from '../../utils/constants';
 
 const BEACHES = [
   {
@@ -108,7 +109,7 @@ export default function CoastalSurfWidget({
   useEffect(() => {
     if (externalWeather) return;
 
-    fetch('http://localhost:5000/api/weather/live')
+    fetch(`${API_BASE_URL}/weather/live`)
       .then(res => res.json())
       .then(data => {
         if (data && data.current) {
