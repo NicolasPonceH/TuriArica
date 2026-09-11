@@ -5,6 +5,7 @@ import { fileURLToPath } from 'node:url';
 import Groq from 'groq-sdk';
 import { dbOperations } from '../db.js';
 import { getLiveWeather } from './weather.js';
+import { getAricaDutyPharmacies, HEALTH_CENTERS_ARICA } from './health.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -26,7 +27,7 @@ Reglas estrictas:
 7. Si hay varios lugares que cumplen, enumera hasta 3 opciones como máximo, con nombre y una frase de por qué recomendarlos.
 8. En ningún caso menciones qué modelo de IA eres ni hagas alusión a OpenAI, Groq u otras tecnologías. Preséntate y actúa siempre como el asistente turístico de Arica.`;
 
-// Función auxiliar para compilar el contexto oficial desde SQLite y RedMeteo
+// Función auxiliar para compilar el contexto oficial desde SQLite, RedMeteo y Farmanet MINSAL
 async function buildOfficialContext() {
   const places = dbOperations.getAllPlaces();
   const events = dbOperations.getActiveEvents();
@@ -45,6 +46,35 @@ async function buildOfficialContext() {
     }
   } catch (e) {
     // Si falla el clima, continuar sin interrumpir el contexto
+  }
+
+  let healthText = '';
+  try {
+    const pharmacies = await getAricaDutyPharmacies();
+    const dutyPharmaciesText = pharmacies && pharmacies.length > 0
+      ? pharmacies.map(f => `- ${f.name}: ${f.address} (${f.neighborhood}). Turno: ${f.openTime} a ${f.closeTime}. Tel: ${f.phone}.`).join('\n')
+      : 'Consultar farmacia de turno en Farmanet MINSAL.';
+
+    const emergencyCentersText = HEALTH_CENTERS_ARICA
+      .filter(c => c.is24h)
+      .map(c => `- ${c.name}: ${c.address}. Horario: ${c.schedule}. Teléfono urgencia: ${c.phone} (Ambulancia SAMU: 131).`)
+      .join('\n');
+
+    healthText = `\n\n--- SALUD, FARMACIAS DE TURNO Y URGENCIAS EN ARICA (MINSAL / DISAM) ---
+* Farmacias de turno vigentes hoy:
+${dutyPharmaciesText}
+
+* Centros de urgencia 24 horas:
+${emergencyCentersText}
+
+* Números de emergencia vital:
+- SAMU Ambulancias: 131
+- Hospital Dr. Juan Noé Crevani: +56 58 220 4000
+- SAR Iris Véliz Hume: +56 58 238 6800
+- Carabineros de Chile: 133
+- Bomberos Arica: 132`;
+  } catch (e) {
+    // Si falla health, continuar
   }
 
   const placesContext = places.map(p => {
@@ -70,7 +100,7 @@ async function buildOfficialContext() {
   }).join('\n\n') : 'No hay alertas ni eventos especiales vigentes en este momento.';
 
   return {
-    text: `--- LUGARES TURÍSTICOS, PATRIMONIALES Y SERVICIOS EN ARICA ---\n${placesContext}\n\n--- EVENTOS Y AVISOS OFICIALES ---\n${eventsContext}${weatherText}`,
+    text: `--- LUGARES TURÍSTICOS, PATRIMONIALES Y SERVICIOS EN ARICA ---\n${placesContext}\n\n--- EVENTOS Y AVISOS OFICIALES ---\n${eventsContext}${weatherText}${healthText}`,
     places,
     events
   };

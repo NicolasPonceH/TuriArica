@@ -103,6 +103,21 @@ export const translations = {
     "pwa.install": "Instalar App",
     "pwa.installDesc": "Instala TuriArica en tu dispositivo para acceso rápido.",
 
+    // Health & Emergencies
+    "health.title": "Salud y Farmacias de Turno",
+    "health.subtitle": "Disponibilidad en tiempo real con datos de Farmanet MINSAL y centros de urgencia de Arica.",
+    "health.badge": "Servicios de Salud Oficiales",
+    "health.dutyPharmacy": "Farmacia de Turno Hoy",
+    "health.dutyPharmacyDesc": "Local de turno asignado oficialmente por el Ministerio de Salud.",
+    "health.emergency24h": "Urgencias 24 Horas",
+    "health.sapuAndCesfam": "SAPUs y CESFAMs",
+    "health.openNow": "Abierto Ahora",
+    "health.closed": "Cerrado",
+    "health.callEmergency": "Llamar",
+    "health.seeRoute": "Cómo llegar",
+    "health.sourceMinsal": "Fuente oficial: Ministerio de Salud (Farmanet Chile)",
+    "health.numbersTitle": "Líneas de Emergencia Vital",
+
     // General
     "general.close": "Cerrar",
     "general.open24h": "Abierto 24h",
@@ -189,6 +204,22 @@ export const translations = {
     "admin.addPhoto": "Add photo",
     "pwa.install": "Install App",
     "pwa.installDesc": "Install TuriArica on your device for quick access.",
+    // Health & Emergencies
+    "health.title": "Health & On-Duty Pharmacies",
+    "health.subtitle": "Real-time availability from Farmanet MINSAL and Arica emergency medical centers.",
+    "health.badge": "Official Health Services",
+    "health.dutyPharmacy": "Pharmacy On Duty Today",
+    "health.dutyPharmacyDesc": "Official on-duty location assigned by the Ministry of Health.",
+    "health.emergency24h": "24-Hour Emergencies",
+    "health.sapuAndCesfam": "Urgent Care & Family Clinics",
+    "health.openNow": "Open Now",
+    "health.closed": "Closed",
+    "health.callEmergency": "Call",
+    "health.seeRoute": "Directions",
+    "health.sourceMinsal": "Official source: Chilean Ministry of Health (Farmanet)",
+    "health.numbersTitle": "Vital Emergency Hotlines",
+
+    // General
     "general.close": "Close",
     "general.open24h": "Open 24h",
     "general.openNow": "Open now",
@@ -222,6 +253,21 @@ export const translations = {
     "admin.title": "Painel de Administração",
     "admin.login": "Entrar",
     "admin.password": "Senha",
+    // Health & Emergencies
+    "health.title": "Saúde e Farmácias de Plantão",
+    "health.subtitle": "Disponibilidade em tempo real com Farmanet MINSAL e centros de emergência de Arica.",
+    "health.badge": "Serviços de Saúde Oficiais",
+    "health.dutyPharmacy": "Farmácia de Plantão Hoje",
+    "health.dutyPharmacyDesc": "Farmácia designada oficialmente pelo Ministério da Saúde.",
+    "health.emergency24h": "Emergências 24 Horas",
+    "health.sapuAndCesfam": "Postos de Saúde e Clínicas",
+    "health.openNow": "Aberto Agora",
+    "health.closed": "Fechado",
+    "health.callEmergency": "Ligar",
+    "health.seeRoute": "Como chegar",
+    "health.sourceMinsal": "Fonte oficial: Ministério da Saúde (Farmanet Chile)",
+    "health.numbersTitle": "Telefones de Emergência",
+
     "general.close": "Fechar",
   },
 };

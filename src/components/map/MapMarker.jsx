@@ -20,7 +20,7 @@ export default function MapMarker({ place, isSelected, onClick, onMouseEnter, on
             ? 'border-white ring-4 ring-accent-400 ring-offset-2 scale-110'
             : 'border-white group-hover:border-accent-200'
         }`}
-        style={{ backgroundColor: place.color }}
+        style={{ backgroundColor: place.color || meta.color || '#0284c7' }}
       >
         <IconComponent size={16} className="text-white drop-shadow" />
       </div>

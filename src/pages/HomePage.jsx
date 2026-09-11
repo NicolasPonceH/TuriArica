@@ -12,6 +12,7 @@ import PWAInstallPrompt from '../components/shared/PWAInstallPrompt';
 import EventPopupModal from '../components/shared/EventPopupModal';
 import CoastalSurfWidget from '../components/home/CoastalSurfWidget';
 import GastronomyHighlights from '../components/home/GastronomyHighlights';
+import HealthServicesWidget from '../components/home/HealthServicesWidget';
 import ItineraryPlannerModal from '../components/shared/ItineraryPlannerModal';
 import { usePlaces } from '../contexts/PlacesContext';
 import { useLanguage } from '../contexts/LanguageContext';
@@ -343,6 +344,9 @@ export default function HomePage() {
 
       {/* Gastronomy Highlights Section */}
       <GastronomyHighlights />
+
+      {/* Health Services & On-Duty Pharmacy Section */}
+      <HealthServicesWidget onSelectDestination={handleRouteClick} />
 
       {/* Map Section */}
       <section id="mapa" className="bg-white py-24 relative overflow-hidden border-t border-gray-100">

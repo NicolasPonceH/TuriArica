@@ -12,6 +12,7 @@ import eventsRouter from './routes/events.js';
 import uploadRouter from './routes/upload.js';
 import aiRouter from './routes/ai.js';
 import weatherRouter from './routes/weather.js';
+import healthRouter from './routes/health.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -53,9 +54,11 @@ app.use('/api/events', eventsRouter);
 app.use('/api/upload', uploadRouter);
 app.use('/api/ai', aiRouter);
 app.use('/api/weather', weatherRouter);
+app.use('/api/health', healthRouter);
+app.use('/api/health-services', healthRouter);
 
-// Health Check
-app.get('/api/health', (req, res) => {
+// System ping check
+app.get('/api/ping', (req, res) => {
   res.json({
     status: 'ok',
     app: 'TuriArica API Server',

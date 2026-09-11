@@ -301,6 +301,21 @@ export default function InteractiveMap({
           );
         })}
 
+        {/* Selected destination marker if not in standard filteredPlaces (e.g. Health Services / Pharmacy) */}
+        {selectedPlace && !filteredPlaces.some(p => p.id === selectedPlace.id) && (
+          <Marker
+            key={selectedPlace.id}
+            longitude={selectedPlace.lng}
+            latitude={selectedPlace.lat}
+            anchor="bottom"
+          >
+            <MapMarker
+              place={selectedPlace}
+              isSelected={true}
+            />
+          </Marker>
+        )}
+
         {/* User location */}
         {userLocation && (
           <Marker longitude={userLocation[0]} latitude={userLocation[1]} anchor="center">
