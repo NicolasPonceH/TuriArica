@@ -13,7 +13,7 @@ export default function PlaceCard({ place, onAudioClick, onRouteClick, onMoreCli
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-50px" }}
       whileHover={{ y: -5 }}
-      className="glass-panel rounded-2xl overflow-hidden flex flex-col h-full group bg-white shadow-lg hover:shadow-xl transition-shadow"
+      className="glass-card rounded-2xl overflow-hidden flex flex-col h-full group hover:shadow-2xl transition-all duration-300 border border-white/80"
     >
       {/* Header with gradient and icon */}
       <div
