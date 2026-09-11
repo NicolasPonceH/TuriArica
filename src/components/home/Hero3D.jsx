@@ -1,38 +1,19 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-const VIDEOS = [
-  "https://res.cloudinary.com/dirgawanf/video/upload/v1789048051/Aerial_view_of_coastline_1080p_20260910104702_znysl3.mp4",
-  "https://res.cloudinary.com/dirgawanf/video/upload/v1789047168/Animating_Morro_de_Arica_image_20260910102927_ucuiqp.mp4",
-  "https://res.cloudinary.com/dirgawanf/video/upload/v1789047390/Camera_moving_over_Lake_Chungar%C3%A1_20260910103602_sxonwf.mp4#t=1.2",
-  "https://res.cloudinary.com/dirgawanf/video/upload/v1789047679/Drone_flying_over_Azapa_Valley_20260910104102_ccgtbt.mp4"
-];
+const HERO_VIDEO = "https://res.cloudinary.com/dirgawanf/video/upload/v1789146026/202609111345_jzwgh2.mp4";
 
 function VideoBackground() {
-  const [currentIndex, setCurrentIndex] = useState(0);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentIndex((prev) => (prev + 1) % VIDEOS.length);
-    }, 6000); // Cambia cada 6 segundos
-    return () => clearInterval(interval);
-  }, []);
-
   return (
     <div className="absolute inset-0 z-0 overflow-hidden bg-black">
-      {VIDEOS.map((src, index) => (
-        <video
-          key={src}
-          src={src}
-          autoPlay
-          muted
-          loop
-          playsInline
-          className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ease-in-out ${
-            index === currentIndex ? 'opacity-100' : 'opacity-0'
-          }`}
-        />
-      ))}
+      <video
+        src={HERO_VIDEO}
+        autoPlay
+        muted
+        loop
+        playsInline
+        className="absolute inset-0 w-full h-full object-cover"
+      />
       {/* Overlay oscuro muy sutil para que resalten los colores reales del video pero el texto blanco se lea */}
       <div className="absolute inset-0 bg-black/30"></div>
       <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-surface-900/90"></div>
