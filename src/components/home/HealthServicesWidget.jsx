@@ -12,7 +12,9 @@ import {
   Building2,
   Sparkles,
   ExternalLink,
-  Search
+  Search,
+  CheckCircle2,
+  RotateCcw
 } from 'lucide-react';
 import { SERVER_URL } from '../../utils/constants';
 import { useLanguage } from '../../contexts/LanguageContext';
@@ -53,6 +55,7 @@ export default function HealthServicesWidget({ onSelectDestination }) {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('farmacias'); // 'farmacias' | 'urgencias' | 'cesfam' | 'telefonos'
   const [pharmacySearch, setPharmacySearch] = useState('');
+  const [selectedItem, setSelectedItem] = useState(null);
 
   useEffect(() => {
     let isMounted = true;
@@ -90,10 +93,17 @@ export default function HealthServicesWidget({ onSelectDestination }) {
     lat: -18.4770,
     lng: -70.2920,
     isOpen: true,
-    statusLabel: 'Abierta de Turno hasta las 21:00'
+    isTurno: true,
+    statusLabel: 'Abierta de Turno hasta las 21:00',
+    category: 'Farmacia',
+    type: 'salud'
   };
 
   const allPharmacies = data?.allPharmacies || [dutyPharmacy];
+
+  // Elemento activo mostrado en la tarjeta grande izquierda (seleccionado por el usuario o por defecto la de turno)
+  const activeItem = selectedItem || dutyPharmacy;
+  const isCustomSelected = Boolean(selectedItem && selectedItem.id !== dutyPharmacy.id);
 
   const filteredPharmacies = allPharmacies.filter(p => {
     if (!pharmacySearch) return true;
@@ -107,6 +117,7 @@ export default function HealthServicesWidget({ onSelectDestination }) {
   });
 
   const handleRouteToPlace = (item) => {
+    setSelectedItem(item);
     if (!onSelectDestination) return;
     const dest = {
       id: item.id || `health-${Date.now()}`,
@@ -152,61 +163,126 @@ export default function HealthServicesWidget({ onSelectDestination }) {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        {/* TARJETA DESTACADA: Farmacia de Turno Hoy con Imagen WebP Optimizada */}
+        {/* TARJETA DINÁMICA IZQUIERDA: Muestra el ítem seleccionado o la Farmacia de Turno */}
         <motion.div
-          initial={{ opacity: 0, y: 15 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="lg:col-span-5 bg-gradient-to-br from-emerald-900 via-teal-900 to-slate-950 text-white rounded-3xl shadow-xl relative overflow-hidden flex flex-col justify-between border border-emerald-500/30 group"
+          key={activeItem.id}
+          initial={{ opacity: 0.8, scale: 0.99 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.2 }}
+          className={`lg:col-span-5 text-white rounded-3xl shadow-xl relative overflow-hidden flex flex-col justify-between border group ${
+            activeItem.type === 'hospital' || activeItem.type === 'sar'
+              ? 'bg-gradient-to-br from-rose-950 via-slate-950 to-rose-900 border-rose-500/40'
+              : activeItem.type === 'cesfam'
+              ? 'bg-gradient-to-br from-sky-950 via-slate-950 to-blue-900 border-sky-500/40'
+              : 'bg-gradient-to-br from-emerald-950 via-teal-950 to-slate-950 border-emerald-500/40'
+          }`}
         >
-          {/* Imagen de fondo WebP optimizada de la Farmacia con iluminación nocturna */}
+          {/* Imagen de fondo WebP optimizada con iluminación nocturna */}
           <div className="absolute inset-0 z-0 overflow-hidden">
             <img
               src="/images/pharmacy.webp"
-              alt="Fachada moderna de farmacia con cruz luminosa"
+              alt="Fachada moderna con cruz luminosa"
               loading="lazy"
               decoding="async"
-              className="w-full h-full object-cover object-center opacity-30 group-hover:scale-105 group-hover:opacity-40 transition-all duration-700"
+              className="w-full h-full object-cover object-center opacity-30 group-hover:scale-105 group-hover:opacity-35 transition-all duration-700"
             />
-            {/* Gradiente oscuro superior y lateral para contraste tipográfico perfecto */}
-            <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-emerald-950/85 to-slate-950/75" />
+            {/* Gradiente de contraste según el tipo seleccionado */}
+            <div
+              className={`absolute inset-0 bg-gradient-to-t ${
+                activeItem.type === 'hospital' || activeItem.type === 'sar'
+                  ? 'from-slate-950 via-rose-950/85 to-slate-950/80'
+                  : activeItem.type === 'cesfam'
+                  ? 'from-slate-950 via-sky-950/85 to-slate-950/80'
+                  : 'from-slate-950 via-emerald-950/85 to-slate-950/80'
+              }`}
+            />
           </div>
 
           <div className="relative z-10 p-6 sm:p-7">
-            {/* Badges superiores con Cruz Roja y Estado */}
+            {/* Badges superiores dinámicos */}
             <div className="flex items-center justify-between gap-3 mb-4 flex-wrap">
-              <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/15 backdrop-blur-md text-white text-xs font-bold border border-white/20 shadow-xs">
-                <div className="w-4 h-4 rounded-full bg-white flex items-center justify-center p-0.5">
-                  <RedCrossIcon className="w-3 h-3" />
-                </div>
-                <span>{t('health.dutyPharmacy') || 'Farmacia de Turno Hoy'}</span>
-              </span>
+              <div className="flex items-center gap-2">
+                <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/15 backdrop-blur-md text-white text-xs font-bold border border-white/20 shadow-xs">
+                  <div className="w-4 h-4 rounded-full bg-white flex items-center justify-center p-0.5">
+                    {activeItem.type === 'hospital' || activeItem.type === 'sar' || activeItem.type === 'sapu' ? (
+                      <RedCrossIcon className="w-3 h-3" />
+                    ) : (
+                      <GreenCrossIcon className="w-3 h-3" />
+                    )}
+                  </div>
+                  <span>
+                    {activeItem.isTurno
+                      ? (t('health.dutyPharmacy') || 'Farmacia de Turno Hoy')
+                      : activeItem.type === 'hospital'
+                      ? 'Hospital Regional'
+                      : activeItem.type === 'sar'
+                      ? 'SAR Urgencias 24h'
+                      : activeItem.type === 'cesfam'
+                      ? 'CESFAM Arica'
+                      : 'Farmacia Seleccionada'}
+                  </span>
+                </span>
 
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/25 backdrop-blur-md text-emerald-300 text-xs font-bold border border-emerald-400/40">
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping inline-block" />
-                {dutyPharmacy.isOpen ? 'Abierta Ahora' : 'De Turno Hoy'}
+                {isCustomSelected && (
+                  <button
+                    onClick={() => setSelectedItem(null)}
+                    className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-amber-400/20 hover:bg-amber-400/30 text-amber-300 text-[11px] font-semibold border border-amber-300/40 transition cursor-pointer"
+                    title="Volver a la Farmacia de Turno de Hoy"
+                  >
+                    <RotateCcw className="w-3 h-3" />
+                    <span>Ver Turno Hoy</span>
+                  </button>
+                )}
+              </div>
+
+              <span
+                className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full backdrop-blur-md text-xs font-bold border ${
+                  activeItem.isOpen
+                    ? 'bg-emerald-500/25 text-emerald-300 border-emerald-400/40'
+                    : 'bg-rose-500/25 text-rose-300 border-rose-400/40'
+                }`}
+              >
+                <span
+                  className={`w-2 h-2 rounded-full animate-ping inline-block ${
+                    activeItem.isOpen ? 'bg-emerald-400' : 'bg-rose-400'
+                  }`}
+                />
+                {activeItem.isOpen
+                  ? (activeItem.isTurno ? 'De Turno Activa' : 'Abierta Ahora')
+                  : 'Cerrada'}
               </span>
             </div>
 
             <h3 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white mb-2 leading-tight">
-              {dutyPharmacy.name}
+              {activeItem.name}
             </h3>
 
-            <div className="flex items-start gap-2 text-emerald-100/90 text-sm mb-4">
+            <div className="flex items-start gap-2 text-slate-200 text-sm mb-4">
               <MapPin className="w-4 h-4 shrink-0 mt-0.5 text-emerald-300" />
-              <span>{dutyPharmacy.address}</span>
+              <span>{activeItem.address} {activeItem.neighborhood ? `(${activeItem.neighborhood})` : ''}</span>
             </div>
 
             {/* Cápsula de horario y zona */}
-            <div className="grid grid-cols-2 gap-2 text-xs py-3 px-3.5 rounded-2xl bg-black/40 backdrop-blur-md border border-white/10 mb-6">
+            <div className="grid grid-cols-2 gap-2 text-xs py-3 px-3.5 rounded-2xl bg-black/45 backdrop-blur-md border border-white/10 mb-6">
               <div>
-                <span className="text-emerald-300 block text-[11px] font-medium">Horario de Turno</span>
+                <span className="text-slate-300 block text-[11px] font-medium">Horario de Atención</span>
                 <span className="font-bold text-white text-xs sm:text-sm">
-                  {dutyPharmacy.openTime ? `${dutyPharmacy.openTime} a ${dutyPharmacy.closeTime}` : '24 Horas'}
+                  {activeItem.is24h
+                    ? 'Urgencias 24 Horas'
+                    : activeItem.schedule || `${activeItem.openTime || '09:00'} a ${activeItem.closeTime || '21:00'}`}
                 </span>
               </div>
               <div>
-                <span className="text-emerald-300 block text-[11px] font-medium">Comuna / Sector</span>
-                <span className="font-bold text-white text-xs sm:text-sm">{dutyPharmacy.neighborhood || 'Arica'}</span>
+                <span className="text-slate-300 block text-[11px] font-medium">Categoría / Tipo</span>
+                <span className="font-bold text-white text-xs sm:text-sm">
+                  {activeItem.isTurno
+                    ? 'Turno Obligatorio MINSAL'
+                    : activeItem.type === 'hospital'
+                    ? 'Urgencia Hospitalaria'
+                    : activeItem.type === 'sar'
+                    ? 'Alta Resolutividad (SAR)'
+                    : activeItem.brand || 'Farmacia Arica'}
+                </span>
               </div>
             </div>
           </div>
@@ -215,16 +291,20 @@ export default function HealthServicesWidget({ onSelectDestination }) {
           <div className="relative z-10 p-6 sm:p-7 pt-0">
             <div className="flex flex-wrap items-center gap-2 pt-3 border-t border-white/15">
               <button
-                onClick={() => handleRouteToPlace(dutyPharmacy)}
-                className="flex-1 min-w-[140px] inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-white font-bold text-xs sm:text-sm active:scale-98 transition shadow-lg cursor-pointer border border-emerald-300/30"
+                onClick={() => handleRouteToPlace(activeItem)}
+                className={`flex-1 min-w-[140px] inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-white font-bold text-xs sm:text-sm active:scale-98 transition shadow-lg cursor-pointer border ${
+                  activeItem.type === 'hospital' || activeItem.type === 'sar'
+                    ? 'bg-gradient-to-r from-rose-600 to-red-600 hover:from-rose-500 hover:to-red-500 border-rose-300/30'
+                    : 'bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 border-emerald-300/30'
+                }`}
               >
                 <Navigation className="w-4 h-4" />
                 {t('health.seeRoute') || 'Cómo llegar'}
               </button>
 
-              {dutyPharmacy.phone && (
+              {activeItem.phone && (
                 <a
-                  href={`tel:${dutyPharmacy.phone.replace(/[^0-9+]/g, '')}`}
+                  href={`tel:${activeItem.phone.replace(/[^0-9+]/g, '')}`}
                   className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-white/15 hover:bg-white/25 border border-white/30 text-white font-semibold text-xs sm:text-sm active:scale-98 transition cursor-pointer"
                 >
                   <Phone className="w-4 h-4" />
@@ -233,12 +313,16 @@ export default function HealthServicesWidget({ onSelectDestination }) {
               )}
             </div>
 
-            <div className="mt-4 flex items-center justify-between text-[11px] text-emerald-200/80">
+            <div className="mt-4 flex items-center justify-between text-[11px] text-slate-300">
               <div className="flex items-center gap-1.5">
-                <ShieldCheck className="w-3.5 h-3.5 text-emerald-300 shrink-0" />
-                <span>{t('health.sourceMinsal') || 'Ministerio de Salud (Farmanet)'}</span>
+                <ShieldCheck className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                <span>
+                  {activeItem.isTurno
+                    ? 'Turno Oficial: Ministerio de Salud (Farmanet)'
+                    : 'Red de Salud y Farmacias de Arica'}
+                </span>
               </div>
-              <span className="text-emerald-300 font-semibold">Región de Arica</span>
+              <span className="text-emerald-300 font-semibold">TuriArica</span>
             </div>
           </div>
         </motion.div>
@@ -320,72 +404,89 @@ export default function HealthServicesWidget({ onSelectDestination }) {
                     />
                   </div>
 
-                  {filteredPharmacies.map((farm) => (
-                    <div
-                      key={farm.id}
-                      className={`p-3.5 sm:p-4 rounded-2xl bg-white border transition shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${
-                        farm.isTurno
-                          ? 'border-emerald-300 ring-2 ring-emerald-500/20 bg-emerald-50/20'
-                          : 'border-slate-100 hover:border-slate-300'
-                      }`}
-                    >
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-1 flex-wrap">
-                          {farm.isTurno ? (
-                            <span className="px-2 py-0.5 rounded-md text-[11px] font-bold uppercase tracking-wider bg-emerald-500 text-white shadow-xs flex items-center gap-1">
-                              <Sparkles className="w-3 h-3" />
-                              De Turno Hoy
-                            </span>
-                          ) : (
-                            <span className={`px-2 py-0.5 rounded-md text-[11px] font-bold uppercase tracking-wider border ${farm.statusClass}`}>
-                              {farm.badgeText || (farm.isOpen ? 'Abierta' : 'Cerrada')}
-                            </span>
-                          )}
+                  {filteredPharmacies.map((farm) => {
+                    const isSelected = activeItem.id === farm.id;
+                    return (
+                      <div
+                        key={farm.id}
+                        onClick={() => setSelectedItem(farm)}
+                        className={`p-3.5 sm:p-4 rounded-2xl border transition shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-3 cursor-pointer group ${
+                          isSelected
+                            ? 'bg-emerald-50/70 border-emerald-400 ring-2 ring-emerald-500/30 shadow-sm'
+                            : farm.isTurno
+                            ? 'bg-emerald-50/30 border-emerald-200 hover:border-emerald-300'
+                            : 'bg-white border-slate-100 hover:border-slate-300 hover:bg-slate-50/60'
+                        }`}
+                      >
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-1 flex-wrap">
+                            {isSelected && (
+                              <span className="px-2 py-0.5 rounded-md text-[11px] font-bold uppercase tracking-wider bg-emerald-600 text-white shadow-xs flex items-center gap-1">
+                                <CheckCircle2 className="w-3 h-3" />
+                                Seleccionada
+                              </span>
+                            )}
 
-                          {farm.brand && (
-                            <span className="text-xs text-slate-400 font-medium">
-                              {farm.brand}
-                            </span>
-                          )}
+                            {farm.isTurno ? (
+                              <span className="px-2 py-0.5 rounded-md text-[11px] font-bold uppercase tracking-wider bg-amber-500 text-white shadow-xs flex items-center gap-1">
+                                <Sparkles className="w-3 h-3" />
+                                De Turno Hoy
+                              </span>
+                            ) : (
+                              <span className={`px-2 py-0.5 rounded-md text-[11px] font-bold uppercase tracking-wider border ${farm.statusClass}`}>
+                                {farm.badgeText || (farm.isOpen ? 'Abierta Ahora' : 'Cerrada')}
+                              </span>
+                            )}
+
+                            {farm.brand && (
+                              <span className="text-xs text-slate-400 font-medium">
+                                {farm.brand}
+                              </span>
+                            )}
+                          </div>
+
+                          <h4 className="text-sm font-bold text-slate-900 flex items-center gap-1.5 group-hover:text-emerald-700 transition">
+                            <GreenCrossIcon className="w-3.5 h-3.5 shrink-0" />
+                            <span>{farm.name}</span>
+                          </h4>
+
+                          <p className="text-xs text-slate-500 mt-0.5 flex items-center gap-1">
+                            <MapPin className="w-3 h-3 text-slate-400 shrink-0" />
+                            <span>{farm.address} {farm.neighborhood ? `(${farm.neighborhood})` : ''}</span>
+                          </p>
+
+                          <p className="text-[11px] text-slate-600 font-medium mt-1 flex items-center gap-1">
+                            <Clock className="w-3 h-3 text-slate-400" />
+                            <span>{farm.schedule || `Horario: ${farm.openTime} a ${farm.closeTime}`}</span>
+                          </p>
                         </div>
 
-                        <h4 className="text-sm font-bold text-slate-900 flex items-center gap-1.5">
-                          <GreenCrossIcon className="w-3.5 h-3.5 shrink-0" />
-                          <span>{farm.name}</span>
-                        </h4>
+                        <div className="flex items-center gap-2 self-end sm:self-center shrink-0">
+                          {farm.phone && (
+                            <a
+                              href={`tel:${farm.phone.replace(/[^0-9+]/g, '')}`}
+                              onClick={(e) => e.stopPropagation()}
+                              className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition"
+                              title="Llamar a farmacia"
+                            >
+                              <Phone className="w-4 h-4" />
+                            </a>
+                          )}
 
-                        <p className="text-xs text-slate-500 mt-0.5 flex items-center gap-1">
-                          <MapPin className="w-3 h-3 text-slate-400 shrink-0" />
-                          <span>{farm.address} {farm.neighborhood ? `(${farm.neighborhood})` : ''}</span>
-                        </p>
-
-                        <p className="text-[11px] text-slate-600 font-medium mt-1 flex items-center gap-1">
-                          <Clock className="w-3 h-3 text-slate-400" />
-                          <span>{farm.schedule || `Horario: ${farm.openTime} a ${farm.closeTime}`}</span>
-                        </p>
-                      </div>
-
-                      <div className="flex items-center gap-2 self-end sm:self-center shrink-0">
-                        {farm.phone && (
-                          <a
-                            href={`tel:${farm.phone.replace(/[^0-9+]/g, '')}`}
-                            className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition"
-                            title="Llamar a farmacia"
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleRouteToPlace(farm);
+                            }}
+                            className="px-3 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-700 text-xs font-bold transition flex items-center gap-1 cursor-pointer border border-emerald-200"
                           >
-                            <Phone className="w-4 h-4" />
-                          </a>
-                        )}
-
-                        <button
-                          onClick={() => handleRouteToPlace(farm)}
-                          className="px-3 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-700 text-xs font-bold transition flex items-center gap-1 cursor-pointer border border-emerald-200"
-                        >
-                          <Navigation className="w-3.5 h-3.5" />
-                          Ruta
-                        </button>
+                            <Navigation className="w-3.5 h-3.5" />
+                            Ruta
+                          </button>
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
 
                   {filteredPharmacies.length === 0 && (
                     <div className="text-center py-6 text-slate-400 text-xs">
@@ -404,50 +505,69 @@ export default function HealthServicesWidget({ onSelectDestination }) {
                   exit={{ opacity: 0, y: -10 }}
                   className="space-y-3"
                 >
-                  {(data?.allCenters?.filter(c => c.is24h || c.type === 'sapu') || []).map(center => (
-                    <div
-                      key={center.id}
-                      className="p-3.5 sm:p-4 rounded-2xl bg-white border border-slate-100 hover:border-slate-300 transition shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-3"
-                    >
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-1 flex-wrap">
-                          <span className={`px-2 py-0.5 rounded-md text-[11px] font-bold uppercase tracking-wider border ${center.statusClass}`}>
-                            {center.badgeText || (center.isOpen ? 'Abierto' : 'Cerrado')}
-                          </span>
-                          <span className="text-xs text-slate-400 font-medium">
-                            {center.type === 'hospital' ? 'Hospital Regional' : center.type === 'sar' ? 'SAR (Alta Resolutividad)' : 'SAPU'}
-                          </span>
-                        </div>
-                        <h4 className="text-sm font-bold text-slate-900 flex items-center gap-1.5">
-                          <RedCrossIcon className="w-3.5 h-3.5 shrink-0" />
-                          <span>{center.name}</span>
-                        </h4>
-                        <p className="text-xs text-slate-500 mt-0.5">{center.address}</p>
-                        <p className="text-[11px] text-slate-600 font-medium mt-1">
-                          ⏱ {center.schedule}
-                        </p>
-                      </div>
+                  {(data?.allCenters?.filter(c => c.is24h || c.type === 'sapu') || []).map(center => {
+                    const isSelected = activeItem.id === center.id;
+                    return (
+                      <div
+                        key={center.id}
+                        onClick={() => setSelectedItem(center)}
+                        className={`p-3.5 sm:p-4 rounded-2xl border transition shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-3 cursor-pointer group ${
+                          isSelected
+                            ? 'bg-rose-50/70 border-rose-400 ring-2 ring-rose-500/30 shadow-sm'
+                            : 'bg-white border-slate-100 hover:border-slate-300 hover:bg-slate-50/60'
+                        }`}
+                      >
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-1 flex-wrap">
+                            {isSelected && (
+                              <span className="px-2 py-0.5 rounded-md text-[11px] font-bold uppercase tracking-wider bg-rose-600 text-white shadow-xs flex items-center gap-1">
+                                <CheckCircle2 className="w-3 h-3" />
+                                Seleccionado
+                              </span>
+                            )}
 
-                      <div className="flex items-center gap-2 self-end sm:self-center shrink-0">
-                        {center.phone && (
-                          <a
-                            href={`tel:${center.phone.replace(/[^0-9+]/g, '')}`}
-                            className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition"
-                            title="Llamar"
+                            <span className={`px-2 py-0.5 rounded-md text-[11px] font-bold uppercase tracking-wider border ${center.statusClass}`}>
+                              {center.badgeText || (center.isOpen ? 'Abierto' : 'Cerrado')}
+                            </span>
+                            <span className="text-xs text-slate-400 font-medium">
+                              {center.type === 'hospital' ? 'Hospital Regional' : center.type === 'sar' ? 'SAR (Alta Resolutividad)' : 'SAPU'}
+                            </span>
+                          </div>
+                          <h4 className="text-sm font-bold text-slate-900 flex items-center gap-1.5 group-hover:text-rose-700 transition">
+                            <RedCrossIcon className="w-3.5 h-3.5 shrink-0" />
+                            <span>{center.name}</span>
+                          </h4>
+                          <p className="text-xs text-slate-500 mt-0.5">{center.address}</p>
+                          <p className="text-[11px] text-slate-600 font-medium mt-1">
+                            ⏱ {center.schedule}
+                          </p>
+                        </div>
+
+                        <div className="flex items-center gap-2 self-end sm:self-center shrink-0">
+                          {center.phone && (
+                            <a
+                              href={`tel:${center.phone.replace(/[^0-9+]/g, '')}`}
+                              onClick={(e) => e.stopPropagation()}
+                              className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition"
+                              title="Llamar"
+                            >
+                              <Phone className="w-4 h-4" />
+                            </a>
+                          )}
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleRouteToPlace(center);
+                            }}
+                            className="px-3 py-1.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-bold transition flex items-center gap-1 cursor-pointer border border-rose-200"
                           >
-                            <Phone className="w-4 h-4" />
-                          </a>
-                        )}
-                        <button
-                          onClick={() => handleRouteToPlace(center)}
-                          className="px-3 py-1.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-bold transition flex items-center gap-1 cursor-pointer border border-rose-200"
-                        >
-                          <Navigation className="w-3.5 h-3.5" />
-                          Ruta
-                        </button>
+                            <Navigation className="w-3.5 h-3.5" />
+                            Ruta
+                          </button>
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </motion.div>
               )}
 
@@ -460,48 +580,67 @@ export default function HealthServicesWidget({ onSelectDestination }) {
                   exit={{ opacity: 0, y: -10 }}
                   className="space-y-3"
                 >
-                  {(data?.allCenters?.filter(c => c.type === 'cesfam') || []).map(center => (
-                    <div
-                      key={center.id}
-                      className="p-3.5 sm:p-4 rounded-2xl bg-white border border-slate-100 hover:border-slate-300 transition shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-3"
-                    >
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-1">
-                          <span className={`px-2 py-0.5 rounded-md text-[11px] font-bold uppercase tracking-wider border ${center.statusClass}`}>
-                            {center.badgeText || (center.isOpen ? 'Abierto' : 'Cerrado')}
-                          </span>
-                          <span className="text-xs text-slate-400 font-medium">Atención Primaria</span>
-                        </div>
-                        <h4 className="text-sm font-bold text-slate-900 flex items-center gap-1.5">
-                          <HeartPulse className="w-3.5 h-3.5 text-sky-600 shrink-0" />
-                          <span>{center.name}</span>
-                        </h4>
-                        <p className="text-xs text-slate-500 mt-0.5">{center.address}</p>
-                        <p className="text-[11px] text-slate-600 font-medium mt-1">
-                          ⏱ {center.schedule}
-                        </p>
-                      </div>
+                  {(data?.allCenters?.filter(c => c.type === 'cesfam') || []).map(center => {
+                    const isSelected = activeItem.id === center.id;
+                    return (
+                      <div
+                        key={center.id}
+                        onClick={() => setSelectedItem(center)}
+                        className={`p-3.5 sm:p-4 rounded-2xl border transition shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-3 cursor-pointer group ${
+                          isSelected
+                            ? 'bg-sky-50/70 border-sky-400 ring-2 ring-sky-500/30 shadow-sm'
+                            : 'bg-white border-slate-100 hover:border-slate-300 hover:bg-slate-50/60'
+                        }`}
+                      >
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-1 flex-wrap">
+                            {isSelected && (
+                              <span className="px-2 py-0.5 rounded-md text-[11px] font-bold uppercase tracking-wider bg-sky-600 text-white shadow-xs flex items-center gap-1">
+                                <CheckCircle2 className="w-3 h-3" />
+                                Seleccionado
+                              </span>
+                            )}
 
-                      <div className="flex items-center gap-2 self-end sm:self-center shrink-0">
-                        {center.phone && (
-                          <a
-                            href={`tel:${center.phone.replace(/[^0-9+]/g, '')}`}
-                            className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition"
-                            title="Llamar"
+                            <span className={`px-2 py-0.5 rounded-md text-[11px] font-bold uppercase tracking-wider border ${center.statusClass}`}>
+                              {center.badgeText || (center.isOpen ? 'Abierto' : 'Cerrado')}
+                            </span>
+                            <span className="text-xs text-slate-400 font-medium">Atención Primaria</span>
+                          </div>
+                          <h4 className="text-sm font-bold text-slate-900 flex items-center gap-1.5 group-hover:text-sky-700 transition">
+                            <HeartPulse className="w-3.5 h-3.5 text-sky-600 shrink-0" />
+                            <span>{center.name}</span>
+                          </h4>
+                          <p className="text-xs text-slate-500 mt-0.5">{center.address}</p>
+                          <p className="text-[11px] text-slate-600 font-medium mt-1">
+                            ⏱ {center.schedule}
+                          </p>
+                        </div>
+
+                        <div className="flex items-center gap-2 self-end sm:self-center shrink-0">
+                          {center.phone && (
+                            <a
+                              href={`tel:${center.phone.replace(/[^0-9+]/g, '')}`}
+                              onClick={(e) => e.stopPropagation()}
+                              className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition"
+                              title="Llamar"
+                            >
+                              <Phone className="w-4 h-4" />
+                            </a>
+                          )}
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleRouteToPlace(center);
+                            }}
+                            className="px-3 py-1.5 rounded-xl bg-sky-50 hover:bg-sky-100 text-sky-700 text-xs font-bold transition flex items-center gap-1 cursor-pointer border border-sky-200"
                           >
-                            <Phone className="w-4 h-4" />
-                          </a>
-                        )}
-                        <button
-                          onClick={() => handleRouteToPlace(center)}
-                          className="px-3 py-1.5 rounded-xl bg-sky-50 hover:bg-sky-100 text-sky-700 text-xs font-bold transition flex items-center gap-1 cursor-pointer border border-sky-200"
-                        >
-                          <Navigation className="w-3.5 h-3.5" />
-                          Ruta
-                        </button>
+                            <Navigation className="w-3.5 h-3.5" />
+                            Ruta
+                          </button>
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </motion.div>
               )}
 

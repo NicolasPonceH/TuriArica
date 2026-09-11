@@ -284,13 +284,16 @@ function calculatePharmacyStatus(pharmacy, timeInfo = getChileanTime()) {
     }
   }
 
+  const isTurno = Boolean(pharmacy.isTurno);
   return {
     isOpen,
-    statusLabel: isOpen ? `Abierta de Turno hasta las ${pharmacy.closeTime || '09:00'}` : `Turno cerrado a las ${pharmacy.closeTime}`,
+    statusLabel: isTurno
+      ? (isOpen ? `Abierta de Turno hasta las ${pharmacy.closeTime || '09:00'}` : `Turno cerrado a las ${pharmacy.closeTime}`)
+      : (isOpen ? `Abierta hoy hasta las ${pharmacy.closeTime || '21:00'}` : `Cerrada · Abre a las ${pharmacy.openTime || '08:30'}`),
     statusClass: isOpen
-      ? 'text-emerald-600 bg-emerald-50 border-emerald-200'
-      : 'text-rose-600 bg-rose-50 border-rose-200',
-    badgeText: isOpen ? 'Turno Activo' : 'Cerrada'
+      ? (isTurno ? 'text-emerald-800 bg-emerald-100/90 border-emerald-300 ring-1 ring-emerald-400' : 'text-emerald-700 bg-emerald-50 border-emerald-200')
+      : 'text-slate-600 bg-slate-100 border-slate-200',
+    badgeText: isTurno ? (isOpen ? 'De Turno Hoy' : 'Turno Cerrado') : (isOpen ? 'Abierta Ahora' : 'Cerrada')
   };
 }
 
