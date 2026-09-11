@@ -1,18 +1,42 @@
-import { useRef } from 'react';
+import { useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-const HERO_VIDEO = "https://res.cloudinary.com/dirgawanf/video/upload/q_auto/v1789146026/202609111345_jzwgh2.mp4";
-const HERO_POSTER = "https://res.cloudinary.com/dirgawanf/video/upload/so_0,q_auto,w_1920/v1789146026/202609111345_jzwgh2.jpg";
+// Video optimizado con moov atom al inicio (faststart), tamaño de 3.3MB y poster en el segundo 3 (Arica iluminada)
+const HERO_VIDEO = "https://res.cloudinary.com/dirgawanf/video/upload/q_auto,w_1280/v1789146026/202609111345_jzwgh2.mp4";
+const HERO_POSTER = "https://res.cloudinary.com/dirgawanf/video/upload/so_3,q_auto,w_1280/v1789146026/202609111345_jzwgh2.jpg";
 
 function VideoBackground() {
   const videoRef = useRef(null);
 
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    // Forzar muted a nivel DOM para superar la política estricta de navegadores (Brave/Chrome/Safari)
+    video.muted = true;
+    video.defaultMuted = true;
+
+    const startPlay = () => {
+      // Saltar el fundido negro de los primeros 1.5 segundos
+      if (video.currentTime < 1.5) {
+        video.currentTime = 1.5;
+      }
+      video.play().catch(() => {});
+    };
+
+    if (video.readyState >= 1) {
+      startPlay();
+    } else {
+      video.addEventListener('loadedmetadata', startPlay, { once: true });
+    }
+  }, []);
+
   const handleTimeUpdate = () => {
     const video = videoRef.current;
     if (!video || !video.duration) return;
-    // Se corta exactamente 1 segundo antes de terminar y vuelve al inicio en bucle infinito
+    // Se corta 1 segundo antes de terminar y vuelve al segundo 1.5 en bucle infinito perfecto
     if (video.currentTime >= video.duration - 1) {
-      video.currentTime = 0;
+      video.currentTime = 1.5;
       video.play().catch(() => {});
     }
   };
@@ -30,7 +54,7 @@ function VideoBackground() {
         onTimeUpdate={handleTimeUpdate}
         onEnded={() => {
           if (videoRef.current) {
-            videoRef.current.currentTime = 0;
+            videoRef.current.currentTime = 1.5;
             videoRef.current.play().catch(() => {});
           }
         }}
