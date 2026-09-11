@@ -134,9 +134,7 @@ export function seedDatabase(adminUser = 'admin', adminPass = 'turiarica2026') {
   }
 
   // C. Places Seed
-  const placeCount = db.prepare('SELECT COUNT(*) as count FROM places').get().count;
-  if (placeCount === 0) {
-    const initialPlaces = [
+  const initialPlaces = [
       {
         name: "Playa El Laucho", category: "Playa", type: "turismo", icon: "Umbrella", color: "#0EA5E9",
         shortDesc: "La playa más popular y accesible de Arica.",
@@ -212,10 +210,55 @@ export function seedDatabase(adminUser = 'admin', adminPass = 'turiarica2026') {
         transport: { lineas: ["12", "14"], direccion: "norte", letrero: "Centro / Mall", parada: "España con Buenos Aires" },
         photos: ["https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&auto=format&fit=crop"],
         videos: [],
-        aiTags: ["chinchorro", "playa", "costanera", "atardecer", "familiar"]
+        aiTags: ["chinchorro", "playa", "costanera", "atardecer", "familiar", "aguas calidas"]
+      },
+      {
+        name: "Playa Las Machas", category: "Playa", type: "turismo", icon: "Waves", color: "#0284C7",
+        shortDesc: "Playa de fuerte oleaje, el paraíso local del surf y bodyboard.",
+        fullDesc: "Ubicada al norte de Chinchorro, Las Machas es famosa por sus fuertes olas y corrientes oceánicas. Es el epicentro ariqueño para la práctica de surf, bodyboard y kitesurf. Cuenta con escuelas locales y arriendo de tablas. NO es apta para el baño debido a las corrientes.",
+        lat: -18.4455, lng: -70.3038, hours: "Abierta todo el año · 24 horas (No apta para baño)", directions: "Extremo norte del borde costero, Av. Las Dunas. Micros 12 o 14.",
+        phone: "", website: "", priceRange: "", is24h: 1, audioFile: "audios/machas_audios.mp3",
+        transport: { lineas: ["12", "14"], direccion: "norte", letrero: "Centro / Mall", parada: "Eliat con Av. España" },
+        photos: ["https://images.unsplash.com/photo-1502680390469-be75c86b636f?w=800&auto=format&fit=crop"],
+        videos: [],
+        aiTags: ["surf", "bodyboard", "olas", "las machas", "playa", "deportes acuaticos", "arena oscura"]
+      },
+      {
+        name: "Ex Isla Alacrán (Ola El Gringo)", category: "Playa", type: "turismo", icon: "Compass", color: "#475569",
+        shortDesc: "Monumento histórico y sede mundial de las olas 'El Gringo' y 'El Buey' para surf y bodyboard.",
+        fullDesc: "Península frente al Morro de Arica. A nivel internacional es reconocida por albergar la ola tubular 'El Gringo' (el Pipeline sudamericano), ola pesada sobre rocas filosas sede de campeonatos mundiales WSL y Arica Pro Tour. Solo para surfistas y bodyboarders de nivel experto. Mar adentro rompe 'El Buey' para surf de olas gigantes.",
+        lat: -18.4803, lng: -70.3324, hours: "Abierta todo el año · 24 horas", directions: "Frente al Morro de Arica, borde costero sur. Micros 12, 14, 8, 10.",
+        phone: "", website: "", priceRange: "", is24h: 1, audioFile: "audios/alacran_audio.mp3",
+        transport: { lineas: ["12", "14", "8", "10"], direccion: "sur", letrero: "Centro / Mall", parada: "Borde Costero frente al Morro" },
+        photos: ["https://images.unsplash.com/photo-1498654896293-37aacf113fd9?w=800&auto=format&fit=crop"],
+        videos: [],
+        aiTags: ["surf", "bodyboard", "el gringo", "wsl", "el buey", "isla alacran", "tubos", "campeonato"]
+      },
+      {
+        name: "Playa La Lisera", category: "Playa", type: "turismo", icon: "Fish", color: "#14B8A6",
+        shortDesc: "Bahía en forma de herradura, aguas calmas sin olas ideal para baño familiar y snorkel.",
+        fullDesc: "Playa La Lisera se caracteriza por su singular forma de herradura cerrada que la protege del oleaje, creando una piscina natural de aguas cristalinas y mansas. Excelente para familias, niños pequeños y natación. Apta para el baño. NO apta para surf.",
+        lat: -18.4933, lng: -70.3261, hours: "Abierta todo el año · 24 horas", directions: "Al sur de El Laucho por Av. Comandante San Martín. Micros 12, 14, 10, 8.",
+        phone: "", website: "", priceRange: "", is24h: 1, audioFile: "audios/lisera_audio.mp3",
+        transport: { lineas: ["12", "14", "10", "8"], direccion: "sur", letrero: "Centro / Mall", parada: "Av. Comandante San Martín" },
+        photos: ["https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&auto=format&fit=crop"],
+        videos: [],
+        aiTags: ["la lisera", "playa", "bano", "familiar", "aguas tranquilas", "snorkel", "sin olas"]
+      },
+      {
+        name: "Humedal del Río Lluta", category: "Naturaleza", type: "turismo", icon: "Bird", color: "#10B981",
+        shortDesc: "Santuario natural y refugio de aves migratorias en el norte de Arica.",
+        fullDesc: "Santuario de la Naturaleza en la desembocadura del Río Lluta de más de 300 hectáreas. Refugio de descanso de más de 160 especies de aves en su ruta migratoria. Senderos y miradores para contemplar la flora y fauna costera.",
+        lat: -18.4161, lng: -70.3224, hours: "Abierto todo el año · 08:00 - 18:30", directions: "Extremo norte de Arica por Ruta 5 o Av. Las Dunas. Taxi o vehículo particular.",
+        phone: "", website: "", priceRange: "", is24h: 0, audioFile: "audios/Humedal_audio.mp3",
+        transport: { lineas: ["taxi"], direccion: "norte", letrero: "Humedal", parada: "Vehículo particular" },
+        photos: ["https://images.unsplash.com/photo-1448375240586-882707db888b?w=800&auto=format&fit=crop"],
+        videos: [],
+        aiTags: ["humedal", "rio lluta", "aves", "santuario", "naturaleza", "fotografia"]
       }
     ];
 
+    const existingNames = new Set(db.prepare('SELECT name FROM places').all().map(p => p.name));
     const insertPlace = db.prepare(`
       INSERT INTO places (
         name, category, type, icon, color, short_desc, full_desc, lat, lng,
@@ -224,19 +267,24 @@ export function seedDatabase(adminUser = 'admin', adminPass = 'turiarica2026') {
       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1)
     `);
 
+    let insertedCount = 0;
     for (const p of initialPlaces) {
-      insertPlace.run(
-        p.name, p.category, p.type, p.icon, p.color, p.shortDesc, p.fullDesc,
-        p.lat, p.lng, p.hours, p.directions, p.phone, p.website, p.priceRange,
-        p.is24h, p.audioFile || '',
-        JSON.stringify(p.transport || {}),
-        JSON.stringify(p.photos || []),
-        JSON.stringify(p.videos || []),
-        JSON.stringify(p.aiTags || [])
-      );
+      if (!existingNames.has(p.name)) {
+        insertPlace.run(
+          p.name, p.category, p.type, p.icon, p.color, p.shortDesc, p.fullDesc,
+          p.lat, p.lng, p.hours, p.directions, p.phone, p.website, p.priceRange,
+          p.is24h, p.audioFile || '',
+          JSON.stringify(p.transport || {}),
+          JSON.stringify(p.photos || []),
+          JSON.stringify(p.videos || []),
+          JSON.stringify(p.aiTags || [])
+        );
+        insertedCount++;
+      }
     }
-    console.log(`[DB] ${initialPlaces.length} lugares iniciales de Arica insertados en la base de datos.`);
-  }
+    if (insertedCount > 0) {
+      console.log(`[DB] ${insertedCount} nuevos lugares de Arica insertados en la base de datos.`);
+    }
 }
 
 // 3. Helper Database Operations

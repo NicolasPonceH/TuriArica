@@ -13,19 +13,15 @@ const envPath = path.resolve(__dirname, '../../.env');
 
 const router = Router();
 
-// Reglas e instrucciones estrictas solicitadas para el Asistente Turístico de Arica
-const STRICT_SYSTEM_PROMPT = `Eres un asistente turístico de Arica y la región de Arica y Parinacota.
+// Reglas e instrucciones para el Asistente Turístico de Arica
+const STRICT_SYSTEM_PROMPT = `Eres el asistente turístico oficial de Arica y de la región de Arica y Parinacota.
 
-Reglas estrictas:
-1. Responde ÚNICAMENTE con base en la información que se te proporcione en el campo "contexto".
-2. Si la pregunta no se puede responder con esa información, di claramente: 
-   "No tengo suficiente información para responder eso con certeza."
-3. No inventes direcciones, horarios, precios, nombres de lugares ni rutas de locomoción.
-4. Si el usuario pide recomendaciones, usa solo los sitios y datos que aparezcan en el contexto.
-5. Responde en español, de forma clara, amable y concreta (máx. 6–8 líneas, salvo que se pida más detalle).
-6. Cuando des direcciones o cómo llegar, sé específico (nombre de paradas, líneas de micro, puntos de referencia) pero solo si están en el contexto.
-7. Si hay varios lugares que cumplen, enumera hasta 3 opciones como máximo, con nombre y una frase de por qué recomendarlos.
-8. En ningún caso menciones qué modelo de IA eres ni hagas alusión a OpenAI, Groq u otras tecnologías. Preséntate y actúa siempre como el asistente turístico de Arica.`;
+Instrucciones:
+1. Basa tus respuestas en la información turística proporcionada en el "Contexto" (lugares, playas, surf, bodyboard, locomoción/micros, gastronomía, clima en vivo, salud y eventos).
+2. Responde en español, con un tono cálido, amable, claro y entusiasta como un excelente guía local (aprox. 4–8 líneas).
+3. Cuando te pregunten qué hacer, qué playas visitar, dónde surfear, cómo llegar en micro o el estado del clima, recomienda con confianza los sitios y datos indicados en el contexto.
+4. Solo di "No tengo suficiente información para responder eso con certeza" si la pregunta es sobre algo completamente ajeno o fuera del alcance de Arica y su contexto turístico.
+5. En ningún caso menciones qué modelo de IA eres ni hagas alusión a OpenAI, Groq u otras tecnologías. Preséntate y actúa siempre como el asistente turístico de Arica.`;
 
 // Función auxiliar para compilar el contexto oficial desde SQLite, RedMeteo y Farmanet MINSAL
 async function buildOfficialContext() {
@@ -99,8 +95,19 @@ ${emergencyCentersText}
 - Más info: ${e.actionUrl || 'Consultar en la app'}`;
   }).join('\n\n') : 'No hay alertas ni eventos especiales vigentes en este momento.';
 
+  const coastalSurfGuide = `\n\n--- GUÍA COSTERA, DEPORTES NÁUTICOS, PLAYAS Y SURF EN ARICA ---
+* PLAYAS APTAS PARA SURF Y BODYBOARD EN ARICA:
+1. Playa Las Machas: La playa insignia para surf y bodyboard en Arica (nivel intermedio a avanzado). Cuenta con olas consistentes sobre fondo arenoso, rompiente potente de orilla y escuelas locales de surf con arriendo de trajes y tablas. NO es apta para el baño debido a las fuertes corrientes de resaca.
+2. Ex Isla Alacrán (Ola "El Gringo" y "El Buey"): Reconocida a nivel mundial como el "Pipeline chileno". "El Gringo" es una ola tubular perfecta, pesada y hueca que rompe sobre fondo de rocas filosas, sede de fechas del campeonato mundial WSL (World Surf League) y Arica Pro Tour. Solo para surfistas y bodyboarders de nivel experto. Al frente en mar abierto rompe "El Buey", ola gigante de mar abierto (big wave tow-in surfing) de hasta 6-8 metros de altura.
+3. La Capilla / Sector Corazones: Rompientes de orilla rocosa hacia el sur de Arica, muy frecuentadas por bodyboarders locales.
+
+* PLAYAS APTAS PARA BAÑO, NATACIÓN Y FAMILIAS (NO APTAS PARA SURF):
+1. Playa El Laucho: Balneario protegido de aguas templadas y muy calmas (funciona como piscina natural), con rampas de accesibilidad universal hasta el agua. Apta para el baño. NO tiene olas para surf.
+2. Playa La Lisera: Bahía en forma de herradura con aguas muy mansas y arena blanca, ideal para niños pequeños, natación y snorkel seguro. Apta para el baño.
+3. Playa Chinchorro: Playa extensa de aguas cálidas y oleaje moderado. Apta para el baño, natación, stand up paddle (SUP), kayak y clases de surf de iniciación para niños pequeños.`;
+
   return {
-    text: `--- LUGARES TURÍSTICOS, PATRIMONIALES Y SERVICIOS EN ARICA ---\n${placesContext}\n\n--- EVENTOS Y AVISOS OFICIALES ---\n${eventsContext}${weatherText}${healthText}`,
+    text: `--- LUGARES TURÍSTICOS, PATRIMONIALES Y SERVICIOS EN ARICA ---\n${placesContext}\n\n--- EVENTOS Y AVISOS OFICIALES ---\n${eventsContext}${weatherText}${healthText}${coastalSurfGuide}`,
     places,
     events
   };
