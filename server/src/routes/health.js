@@ -394,20 +394,183 @@ export async function getAricaDutyPharmacies() {
   return fallback;
 }
 
+// Catálogo de farmacias permanentes y cadenas de Arica
+export const ARICA_PERMANENT_PHARMACIES = [
+  {
+    id: 'farm-cruz-verde-21mayo',
+    name: 'Farmacia Cruz Verde (Paseo 21 de Mayo)',
+    brand: 'Cruz Verde',
+    address: '21 de Mayo 402, Arica Centro',
+    neighborhood: 'Centro Histórico',
+    phone: '+56 800 500 005',
+    lat: -18.4782,
+    lng: -70.3204,
+    openTime: '08:30',
+    closeTime: '21:30',
+    schedule: 'Lun a Sáb 08:30 - 21:30 · Dom 09:30 - 20:30',
+    category: 'Farmacia',
+    type: 'salud'
+  },
+  {
+    id: 'farm-salcobrand-21mayo',
+    name: 'Farmacia Salcobrand (Paseo 21 de Mayo)',
+    brand: 'Salcobrand',
+    address: '21 de Mayo 398, Arica Centro',
+    neighborhood: 'Centro Histórico',
+    phone: '+56 600 360 6000',
+    lat: -18.4784,
+    lng: -70.3207,
+    openTime: '08:30',
+    closeTime: '21:00',
+    schedule: 'Lun a Sáb 08:30 - 21:00 · Dom 10:00 - 19:00',
+    category: 'Farmacia',
+    type: 'salud'
+  },
+  {
+    id: 'farm-ahumada-21mayo',
+    name: 'Farmacia Ahumada (Paseo 21 de Mayo)',
+    brand: 'Ahumada',
+    address: '21 de Mayo 432, Arica Centro',
+    neighborhood: 'Centro Histórico',
+    phone: '+56 600 222 4000',
+    lat: -18.4781,
+    lng: -70.3202,
+    openTime: '08:30',
+    closeTime: '21:30',
+    schedule: 'Lun a Sáb 08:30 - 21:30 · Dom 09:30 - 20:00',
+    category: 'Farmacia',
+    type: 'salud'
+  },
+  {
+    id: 'farm-popular-municipal',
+    name: 'Farmacia Popular Municipal de Arica',
+    brand: 'Municipalidad de Arica',
+    address: 'Av. 18 de Septiembre 1221, Arica',
+    neighborhood: 'Sector Hospital Regional',
+    phone: '+56 58 238 6890',
+    lat: -18.4839,
+    lng: -70.3115,
+    openTime: '09:00',
+    closeTime: '17:00',
+    schedule: 'Lun a Vie 09:00 - 17:00 · Medicamentos a bajo costo',
+    category: 'Farmacia',
+    type: 'salud'
+  },
+  {
+    id: 'farm-cruz-verde-mall',
+    name: 'Farmacia Cruz Verde (Mallplaza Arica)',
+    brand: 'Cruz Verde',
+    address: 'Av. Diego Portales 640, Mallplaza Arica',
+    neighborhood: 'Costanera Norte',
+    phone: '+56 800 500 005',
+    lat: -18.4682,
+    lng: -70.3061,
+    openTime: '10:00',
+    closeTime: '21:00',
+    schedule: 'Lunes a Domingo 10:00 - 21:00',
+    category: 'Farmacia',
+    type: 'salud'
+  },
+  {
+    id: 'farm-redfarma-santamaria',
+    name: 'Farmacia Redfarma (Santa María)',
+    brand: 'Redfarma',
+    address: 'Av. Santa María 2110, Arica',
+    neighborhood: 'Sector Santa María',
+    phone: '+56 58 222 3344',
+    lat: -18.4795,
+    lng: -70.3015,
+    openTime: '09:00',
+    closeTime: '21:00',
+    schedule: 'Lunes a Sábado 09:00 - 21:00',
+    category: 'Farmacia',
+    type: 'salud'
+  },
+  {
+    id: 'farm-prat-centro',
+    name: 'Farmacia Prat (Independiente)',
+    brand: 'Prat',
+    address: 'Arturo Prat 360, Arica Centro',
+    neighborhood: 'Centro Comercial',
+    phone: '+56 58 225 1200',
+    lat: -18.4772,
+    lng: -70.3188,
+    openTime: '09:00',
+    closeTime: '20:30',
+    schedule: 'Lunes a Sábado 09:00 - 20:30',
+    category: 'Farmacia',
+    type: 'salud'
+  }
+];
+
+// Obtiene todas las farmacias de Arica combinando la de turno MINSAL y las permanentes
+export async function getAllAricaPharmacies() {
+  const timeInfo = getChileanTime();
+  const dutyList = await getAricaDutyPharmacies();
+  const mainDuty = dutyList[0];
+
+  // Formatear permanentes con su estado en vivo
+  const permanentList = ARICA_PERMANENT_PHARMACIES.map(farm => {
+    const status = calculatePharmacyStatus(farm, timeInfo);
+    // Verificar si esta farmacia permanente coincide con la de turno hoy
+    const isThisTurno = mainDuty && (
+      (farm.address && mainDuty.address && farm.address.toLowerCase().includes(mainDuty.address.toLowerCase().slice(0, 8))) ||
+      (farm.name && mainDuty.name && farm.name.toLowerCase().includes(mainDuty.name.toLowerCase()))
+    );
+
+    return {
+      ...farm,
+      isTurno: Boolean(isThisTurno),
+      ...status,
+      badgeText: isThisTurno ? 'De Turno Hoy' : status.badgeText
+    };
+  });
+
+  // Si la de turno de Farmanet no está en las permanentes, colocarla al inicio
+  const isDutyAlreadyIncluded = permanentList.some(p => p.isTurno);
+  let consolidated = [];
+
+  if (mainDuty && !isDutyAlreadyIncluded) {
+    consolidated.push({
+      ...mainDuty,
+      isTurno: true,
+      badgeText: 'De Turno Hoy',
+      statusClass: 'text-emerald-700 bg-emerald-50 border-emerald-300 ring-1 ring-emerald-400/40'
+    });
+  }
+
+  consolidated = [...consolidated, ...permanentList];
+
+  // Ordenar: primero las de turno, luego abiertas, luego cerradas
+  consolidated.sort((a, b) => {
+    if (a.isTurno && !b.isTurno) return -1;
+    if (!a.isTurno && b.isTurno) return 1;
+    if (a.isOpen && !b.isOpen) return -1;
+    if (!a.isOpen && b.isOpen) return 1;
+    return 0;
+  });
+
+  return {
+    dutyPharmacy: mainDuty,
+    allPharmacies: consolidated
+  };
+}
+
 // -------------------------------------------------------------
 // ENDPOINTS
 // -------------------------------------------------------------
 
-// 1. GET /api/health/duty-pharmacies -> Farmacias de turno vigentes en Arica
+// 1. GET /api/health/duty-pharmacies -> Farmacias de turno y directorio completo
 router.get('/duty-pharmacies', async (req, res) => {
   try {
-    const pharmacies = await getAricaDutyPharmacies();
+    const { dutyPharmacy, allPharmacies } = await getAllAricaPharmacies();
     res.json({
       success: true,
-      source: 'Ministerio de Salud de Chile (Farmanet)',
+      source: 'Ministerio de Salud de Chile (Farmanet) & Red Arica',
       date: new Date().toISOString().split('T')[0],
-      count: pharmacies.length,
-      pharmacies
+      count: allPharmacies.length,
+      dutyPharmacy,
+      pharmacies: allPharmacies
     });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
@@ -441,7 +604,7 @@ router.get('/centers', (req, res) => {
 router.get('/summary', async (req, res) => {
   try {
     const timeInfo = getChileanTime();
-    const pharmacies = await getAricaDutyPharmacies();
+    const { dutyPharmacy, allPharmacies } = await getAllAricaPharmacies();
     const centers = HEALTH_CENTERS_ARICA.map(center => ({
       ...center,
       ...calculateCenterStatus(center, timeInfo)
@@ -454,7 +617,9 @@ router.get('/summary', async (req, res) => {
       success: true,
       date: timeInfo.localDate.toISOString().split('T')[0],
       currentTimeChile: timeInfo.localDate.toLocaleTimeString('es-CL', { hour: '2-digit', minute: '2-digit' }),
-      pharmaciesOnDuty: pharmacies,
+      dutyPharmacy,
+      pharmaciesOnDuty: allPharmacies.filter(p => p.isTurno),
+      allPharmacies,
       emergencies24h,
       allCenters: centers,
       emergencyNumbers: [
