@@ -1,17 +1,17 @@
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Send, Bot, Volume2, VolumeX } from 'lucide-react';
+import { X, Send, Bot, Volume2, VolumeX, Bus, Landmark, CloudSun, Utensils, Waves } from 'lucide-react';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { API_BASE_URL } from '../../utils/constants';
 
 const API_BASE = API_BASE_URL;
 
 const QUICK_PROMPTS = [
-  '🚌 ¿Qué micro me lleva a Playa El Laucho?',
-  '🏛️ ¿Dónde están las momias Chinchorro?',
-  '🌤️ ¿Cómo está el clima hoy en Arica?',
-  '🍽️ ¿Dónde probar comida típica en el Agro?',
-  '🏄‍♂️ ¿Qué playas son aptas para surf o bodyboard?'
+  { label: '¿Qué micro va a El Laucho?', query: '¿Qué micro me lleva a Playa El Laucho?', Icon: Bus },
+  { label: 'Momias Chinchorro', query: '¿Dónde están las momias Chinchorro?', Icon: Landmark },
+  { label: 'Clima actual', query: '¿Cómo está el clima hoy en Arica?', Icon: CloudSun },
+  { label: 'Comida típica en el Agro', query: '¿Dónde probar comida típica en el Agro?', Icon: Utensils },
+  { label: 'Playas para surf', query: '¿Qué playas son aptas para surf o bodyboard?', Icon: Waves }
 ];
 
 export default function AssistantModal({ onClose }) {
@@ -259,16 +259,20 @@ export default function AssistantModal({ onClose }) {
         {/* Quick Prompts Bar */}
         <div className="px-4 py-2 bg-white border-t border-slate-100 flex items-center gap-2 overflow-x-auto no-scrollbar">
           <span className="text-[10px] font-black uppercase tracking-wider text-slate-400 shrink-0">Preguntas frecuentes:</span>
-          {QUICK_PROMPTS.map((q, idx) => (
-            <button
-              key={idx}
-              onClick={() => handleSend(q)}
-              disabled={isTyping}
-              className="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-sky-50 text-sky-800 border border-sky-100 hover:bg-sky-100 hover:border-sky-200 whitespace-nowrap transition-colors shrink-0 cursor-pointer disabled:opacity-50"
-            >
-              {q}
-            </button>
-          ))}
+          {QUICK_PROMPTS.map((item, idx) => {
+            const ItemIcon = item.Icon;
+            return (
+              <button
+                key={idx}
+                onClick={() => handleSend(item.query)}
+                disabled={isTyping}
+                className="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-sky-50 text-sky-800 border border-sky-100 hover:bg-sky-100 hover:border-sky-200 whitespace-nowrap transition-colors shrink-0 cursor-pointer disabled:opacity-50 flex items-center gap-1.5"
+              >
+                <ItemIcon size={12} className="text-sky-600" />
+                <span>{item.label}</span>
+              </button>
+            );
+          })}
         </div>
 
         {/* Input Area */}

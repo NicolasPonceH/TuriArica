@@ -266,54 +266,82 @@ export default function CoastalSurfWidget({
           <div className="flex items-center gap-1.5 text-slate-500 font-medium">
             <Sparkles size={13} className="text-amber-500" />
             <span>Fondo ambiental de la ciudad:</span>
-            <strong className="text-slate-800 font-bold">
-              {!previewCondition
-                ? `🔴 Tiempo real (${activeWeather.condition})`
-                : (previewCondition === 'clear' ? '☀️ Soleado' : previewCondition === 'cloudy' ? '☁️ Nublado' : previewCondition === 'sunset' ? '🌅 Atardecer' : '🌙 Noche')}
+            <strong className="text-slate-800 font-bold flex items-center gap-1">
+              {!previewCondition ? (
+                <>
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                  <span>Tiempo real ({activeWeather.condition})</span>
+                </>
+              ) : previewCondition === 'clear' ? (
+                <>
+                  <Sun size={13} className="text-amber-500" />
+                  <span>Soleado</span>
+                </>
+              ) : previewCondition === 'cloudy' ? (
+                <>
+                  <Cloud size={13} className="text-slate-500" />
+                  <span>Nublado</span>
+                </>
+              ) : previewCondition === 'sunset' ? (
+                <>
+                  <Sunset size={13} className="text-orange-500" />
+                  <span>Atardecer</span>
+                </>
+              ) : (
+                <>
+                  <Moon size={13} className="text-indigo-500" />
+                  <span>Noche</span>
+                </>
+              )}
             </strong>
           </div>
 
           <div className="flex items-center gap-1 bg-slate-100/90 p-1 rounded-xl border border-slate-200/80">
             <button
               onClick={() => onSetPreviewCondition(null)}
-              className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all cursor-pointer ${
-                !previewCondition ? 'bg-white text-brand-600 shadow-xs' : 'text-slate-600 hover:text-slate-900'
+              className={`px-2.5 py-1 rounded-lg text-[11px] font-bold btn-tactile cursor-pointer flex items-center gap-1.5 ${
+                !previewCondition ? 'bg-white text-emerald-600 shadow-xs scale-[1.02]' : 'text-slate-600 hover:text-slate-900'
               }`}
               title="Volver a la observación en tiempo real de RedMeteo"
             >
-              🔴 En vivo
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+              <span>En vivo</span>
             </button>
             <button
               onClick={() => onSetPreviewCondition('clear')}
-              className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all cursor-pointer ${
-                previewCondition === 'clear' ? 'bg-white text-amber-600 shadow-xs' : 'text-slate-600 hover:text-slate-900'
+              className={`px-2.5 py-1 rounded-lg text-[11px] font-bold btn-tactile cursor-pointer flex items-center gap-1 ${
+                previewCondition === 'clear' ? 'bg-white text-amber-600 shadow-xs scale-[1.02]' : 'text-slate-600 hover:text-slate-900'
               }`}
             >
-              ☀️ Soleado
+              <Sun size={12} />
+              <span>Soleado</span>
             </button>
             <button
               onClick={() => onSetPreviewCondition('cloudy')}
-              className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all cursor-pointer ${
-                previewCondition === 'cloudy' ? 'bg-white text-slate-700 shadow-xs' : 'text-slate-600 hover:text-slate-900'
+              className={`px-2.5 py-1 rounded-lg text-[11px] font-bold btn-tactile cursor-pointer flex items-center gap-1 ${
+                previewCondition === 'cloudy' ? 'bg-white text-slate-700 shadow-xs scale-[1.02]' : 'text-slate-600 hover:text-slate-900'
               }`}
             >
-              ☁️ Nublado
+              <Cloud size={12} />
+              <span>Nublado</span>
             </button>
             <button
               onClick={() => onSetPreviewCondition('sunset')}
-              className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all cursor-pointer ${
-                previewCondition === 'sunset' ? 'bg-white text-orange-600 shadow-xs' : 'text-slate-600 hover:text-slate-900'
+              className={`px-2.5 py-1 rounded-lg text-[11px] font-bold btn-tactile cursor-pointer flex items-center gap-1 ${
+                previewCondition === 'sunset' ? 'bg-white text-orange-600 shadow-xs scale-[1.02]' : 'text-slate-600 hover:text-slate-900'
               }`}
             >
-              🌅 Atardecer
+              <Sunset size={12} />
+              <span>Atardecer</span>
             </button>
             <button
               onClick={() => onSetPreviewCondition('night')}
-              className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all cursor-pointer ${
-                previewCondition === 'night' ? 'bg-white text-indigo-600 shadow-xs' : 'text-slate-600 hover:text-slate-900'
+              className={`px-2.5 py-1 rounded-lg text-[11px] font-bold btn-tactile cursor-pointer flex items-center gap-1 ${
+                previewCondition === 'night' ? 'bg-white text-indigo-600 shadow-xs scale-[1.02]' : 'text-slate-600 hover:text-slate-900'
               }`}
             >
-              🌙 Noche
+              <Moon size={12} />
+              <span>Noche</span>
             </button>
           </div>
         </div>
@@ -327,10 +355,10 @@ export default function CoastalSurfWidget({
             <button
               key={b.name}
               onClick={() => setSelectedBeach(idx)}
-              className={`text-left p-4 rounded-2xl transition-all border cursor-pointer ${
+              className={`text-left p-4 rounded-2xl btn-tactile border cursor-pointer ${
                 isSelected
                   ? 'bg-brand-500 text-white border-brand-500 shadow-lg shadow-brand-500/25 scale-[1.02]'
-                  : 'bg-slate-50 hover:bg-slate-100/80 text-slate-700 border-slate-200/70'
+                  : 'bg-slate-50 hover:bg-slate-100/80 text-slate-700 border-slate-200/70 hover:border-slate-300'
               }`}
             >
               <div className="flex items-center justify-between mb-1">
@@ -370,7 +398,7 @@ export default function CoastalSurfWidget({
           </div>
           <button
             onClick={handleViewOnMap}
-            className="px-5 py-3 bg-brand-500 hover:bg-brand-600 text-white rounded-xl text-xs font-black transition-all shadow-md shadow-brand-500/20 flex items-center gap-1.5 hover:scale-105 active:scale-95 shrink-0 cursor-pointer"
+            className="px-5 py-3 bg-brand-500 hover:bg-brand-600 text-white rounded-xl text-xs font-black shadow-md shadow-brand-500/20 flex items-center gap-1.5 btn-tactile hover:scale-[1.03] active:scale-[0.97] shrink-0 cursor-pointer"
           >
             <span>Ver en Mapa</span>
             <ChevronRight size={14} />

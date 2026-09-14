@@ -11,13 +11,29 @@ export default function EventPopupModal() {
   const getTypeBadge = (type) => {
     switch (type) {
       case 'festival':
-        return <span className="px-3 py-1 rounded-full text-xs font-black bg-amber-400 text-amber-950 uppercase tracking-wider">🎉 Festival</span>;
+        return (
+          <span className="px-3 py-1 rounded-full text-xs font-black bg-amber-400 text-amber-950 uppercase tracking-wider flex items-center gap-1.5">
+            <Sparkles size={12} /> Festival
+          </span>
+        );
       case 'alerta':
-        return <span className="px-3 py-1 rounded-full text-xs font-black bg-red-500 text-white uppercase tracking-wider">⚠️ Aviso Preventivo</span>;
+        return (
+          <span className="px-3 py-1 rounded-full text-xs font-black bg-red-500 text-white uppercase tracking-wider flex items-center gap-1.5">
+            <AlertTriangle size={12} /> Aviso Preventivo
+          </span>
+        );
       case 'cultural':
-        return <span className="px-3 py-1 rounded-full text-xs font-black bg-purple-500 text-white uppercase tracking-wider">🎭 Cultura</span>;
+        return (
+          <span className="px-3 py-1 rounded-full text-xs font-black bg-purple-500 text-white uppercase tracking-wider flex items-center gap-1.5">
+            <Sparkles size={12} /> Cultura
+          </span>
+        );
       default:
-        return <span className="px-3 py-1 rounded-full text-xs font-black bg-brand-500 text-white uppercase tracking-wider">📅 Evento</span>;
+        return (
+          <span className="px-3 py-1 rounded-full text-xs font-black bg-brand-500 text-white uppercase tracking-wider flex items-center gap-1.5">
+            <Calendar size={12} /> Evento
+          </span>
+        );
     }
   };
 

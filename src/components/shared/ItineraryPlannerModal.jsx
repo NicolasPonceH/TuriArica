@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Calendar, Sparkles, MapPin, Clock, Bus, X, Check, ArrowRight, Compass, Sun } from 'lucide-react';
+import { Calendar, Sparkles, MapPin, Clock, Bus, X, Check, ArrowRight, Compass, Sun, Zap, Umbrella, Landmark } from 'lucide-react';
 
 const ITINERARIES = {
   '1-playa': [
@@ -82,7 +82,10 @@ export default function ItineraryPlannerModal({ isOpen, onClose }) {
                       : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
                   }`}
                 >
-                  ⚡ 1 Día Express
+                  <span className="flex items-center justify-center gap-1.5">
+                    <Zap size={14} className="text-amber-500" />
+                    <span>1 Día Express</span>
+                  </span>
                 </button>
                 <button
                   type="button"
@@ -93,7 +96,10 @@ export default function ItineraryPlannerModal({ isOpen, onClose }) {
                       : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
                   }`}
                 >
-                  🌴 Fin de Semana (2-3 Días)
+                  <span className="flex items-center justify-center gap-1.5">
+                    <Calendar size={14} className="text-sky-500" />
+                    <span>Fin de Semana (2-3 Días)</span>
+                  </span>
                 </button>
               </div>
             </div>
@@ -113,7 +119,10 @@ export default function ItineraryPlannerModal({ isOpen, onClose }) {
                         : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
                     }`}
                   >
-                    🏖️ Playas & Relajo Costero
+                    <span className="flex items-center justify-center gap-1.5">
+                      <Umbrella size={14} />
+                      <span>Playas & Relajo Costero</span>
+                    </span>
                   </button>
                   <button
                     type="button"
@@ -124,7 +133,10 @@ export default function ItineraryPlannerModal({ isOpen, onClose }) {
                         : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
                     }`}
                   >
-                    🏛️ Historia, Eiffel & Momias
+                    <span className="flex items-center justify-center gap-1.5">
+                      <Landmark size={14} />
+                      <span>Historia, Eiffel & Momias</span>
+                    </span>
                   </button>
                 </div>
               </div>

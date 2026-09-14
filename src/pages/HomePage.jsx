@@ -1,25 +1,26 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, lazy, Suspense } from 'react';
 import Navigation from '../components/layout/Navigation';
 import Footer from '../components/layout/Footer';
 import Hero3D from '../components/home/Hero3D';
 import CategoryFilter from '../components/home/CategoryFilter';
 import PlaceCard from '../components/home/PlaceCard';
-import InteractiveMap from '../components/map/InteractiveMap';
+const InteractiveMap = lazy(() => import('../components/map/InteractiveMap'));
 import AccessibilityToolbar from '../components/shared/AccessibilityToolbar';
 import AssistantModal from '../components/shared/AssistantModal';
 import PlaceDetailModal from '../components/shared/PlaceDetailModal';
 import PWAInstallPrompt from '../components/shared/PWAInstallPrompt';
 import EventPopupModal from '../components/shared/EventPopupModal';
-import CoastalSurfWidget from '../components/home/CoastalSurfWidget';
 import GastronomyHighlights from '../components/home/GastronomyHighlights';
 import HealthServicesWidget from '../components/home/HealthServicesWidget';
+import FAQSection from '../components/home/FAQSection';
 import ItineraryPlannerModal from '../components/shared/ItineraryPlannerModal';
 import { usePlaces } from '../contexts/PlacesContext';
 import { useLanguage } from '../contexts/LanguageContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import { calculateHaversine } from '../utils/haversine';
 import { API, FALLBACK_LOCATION, SERVER_URL } from '../utils/constants';
-import { Sparkles, Compass } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Sparkles, Compass, Map, ChevronDown, ChevronUp, Maximize2 } from 'lucide-react';
 
 const CLIMATE_THEMES = {
   clear: {
@@ -128,6 +129,17 @@ export default function HomePage() {
     ? filteredByType
     : filteredByType.filter(p => p.category === activeCategory);
 
+  // Paginación limpia: mostrar inicialmente 6 lugares para no saturar la vista
+  const INITIAL_VISIBLE_COUNT = 6;
+  const [visibleCount, setVisibleCount] = useState(INITIAL_VISIBLE_COUNT);
+
+  useEffect(() => {
+    setVisibleCount(INITIAL_VISIBLE_COUNT);
+  }, [activeCategory, activeType]);
+
+  const displayedPlaces = filteredPlaces.slice(0, visibleCount);
+  const hasMorePlaces = filteredPlaces.length > visibleCount;
+
   const handleAudioClick = (place) => {
     if (currentAudio) {
       currentAudio.pause();
@@ -221,7 +233,7 @@ export default function HomePage() {
   };
 
   return (
-    <div className={`min-h-screen ${climateTheme.bgClass} ${climateTheme.textColor} font-sans selection:bg-brand-500/30 selection:text-brand-600 transition-colors duration-1000 relative overflow-x-hidden`}>
+    <div className={`min-h-screen ${climateTheme.bgClass} ${climateTheme.textColor} ${activeCondition === 'night' ? 'theme-night' : ''} font-sans selection:bg-brand-500/30 selection:text-brand-600 transition-colors duration-1000 relative overflow-x-hidden`}>
       {/* Fondo ambiental dinámico según el clima de Arica (Soleado, Nublado, Atardecer, Noche) */}
       <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
         {climateTheme.ambientGradients}
@@ -229,7 +241,20 @@ export default function HomePage() {
 
       <div className="relative z-10">
         <Navigation />
-        <Hero3D />
+        <Hero3D
+          weatherData={liveWeather ? {
+            temp: liveWeather.current.temp,
+            condition: liveWeather.current.condition,
+            conditionType: activeCondition,
+            conditionDesc: liveWeather.current.conditionDesc,
+            humidity: liveWeather.current.humidity,
+            windSpeedKmH: liveWeather.current.windSpeedKmH,
+            windDirection: liveWeather.current.windDirection,
+            uvIndex: liveWeather.current.uvIndex,
+            stationName: liveWeather.station?.name || 'Arica - Capitanía de Puerto'
+          } : null}
+          activeCondition={activeCondition}
+        />
 
         <AccessibilityToolbar
           onAssistantClick={() => setShowAssistant(true)}
@@ -240,8 +265,8 @@ export default function HomePage() {
 
         {showAssistant && <AssistantModal onClose={() => setShowAssistant(false)} />}
 
-        {/* Travel Hub Section (Itinerary Planner + Live Beach Conditions) */}
-        <section className="max-w-6xl mx-auto px-4 sm:px-6 pt-12 sm:pt-16 pb-4 space-y-6">
+        {/* Travel Hub Section (Itinerary Planner) */}
+        <section className="max-w-6xl mx-auto px-4 sm:px-6 pt-10 sm:pt-14 pb-2">
           {/* Smart Itinerary Planner CTA Banner */}
           <div className="glass-card rounded-3xl p-6 sm:p-7 shadow-xl shadow-sky-950/5 border border-white/80 flex flex-col sm:flex-row items-center justify-between gap-5 relative overflow-hidden backdrop-blur-xl">
             <div className="absolute top-0 right-0 w-80 h-full bg-gradient-to-l from-amber-100/30 via-sky-100/20 to-transparent pointer-events-none" />
@@ -266,41 +291,12 @@ export default function HomePage() {
 
             <button
               onClick={() => setShowPlanner(true)}
-              className="px-6 py-3.5 rounded-xl bg-gradient-to-r from-accent-500 to-amber-500 hover:from-accent-600 hover:to-amber-600 text-white font-black text-xs sm:text-sm shadow-lg shadow-orange-500/25 transition-all hover:scale-105 active:scale-95 shrink-0 flex items-center gap-2 z-10 cursor-pointer"
+              className="px-6 py-3.5 rounded-xl bg-gradient-to-r from-accent-500 to-amber-500 hover:from-accent-600 hover:to-amber-600 text-white font-black text-xs sm:text-sm shadow-lg shadow-orange-500/25 btn-tactile hover:scale-[1.03] active:scale-[0.97] shrink-0 flex items-center gap-2 z-10 cursor-pointer"
             >
               <Sparkles size={16} />
               <span>Armar Mi Itinerario</span>
             </button>
           </div>
-
-          {/* Coastal Surf & Beaches Live Widget */}
-          <CoastalSurfWidget
-            weatherData={liveWeather ? {
-              temp: liveWeather.current.temp,
-              condition: previewCondition ? (previewCondition === 'clear' ? 'Soleado' : previewCondition === 'cloudy' ? 'Nublado' : previewCondition === 'sunset' ? 'Atardecer' : 'Noche Despejada') : liveWeather.current.condition,
-              conditionType: activeCondition,
-              conditionDesc: previewCondition ? (previewCondition === 'clear' ? 'Sol radiante de Eterna Primavera' : previewCondition === 'cloudy' ? 'Cielo cubierto con nubosidad costera' : previewCondition === 'sunset' ? 'Atardecer dorado frente al Pacífico' : 'Noche serena bajo el cielo del norte') : liveWeather.current.conditionDesc,
-              humidity: liveWeather.current.humidity,
-              windSpeedKmH: liveWeather.current.windSpeedKmH,
-              windDirection: liveWeather.current.windDirection,
-              uvIndex: previewCondition === 'night' ? 0 : previewCondition === 'cloudy' ? 1 : liveWeather.current.uvIndex,
-              stationName: liveWeather.station?.name || 'Arica - Capitanía de Puerto',
-              lastUpdate: liveWeather.station?.lastUpdate
-                ? new Date(liveWeather.station.lastUpdate).toLocaleTimeString('es-CL', { hour: '2-digit', minute: '2-digit' })
-                : 'En vivo'
-            } : null}
-            activeCondition={activeCondition}
-            previewCondition={previewCondition}
-            onSetPreviewCondition={setPreviewCondition}
-            onSelectBeach={(beachName) => {
-              const match = places.find(p => p.name.toLowerCase().includes(beachName.toLowerCase()));
-              if (match) {
-                handleRouteClick(match);
-              } else {
-                document.getElementById('mapa')?.scrollIntoView({ behavior: 'smooth' });
-              }
-            }}
-          />
         </section>
 
         {/* Places Section */}
@@ -323,7 +319,7 @@ export default function HomePage() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <AnimatePresence mode="popLayout">
-            {filteredPlaces.map(place => (
+            {displayedPlaces.map(place => (
               <PlaceCard
                 key={place.id}
                 place={place}
@@ -335,9 +331,46 @@ export default function HomePage() {
           </AnimatePresence>
         </div>
 
+        {/* Barra de acción: Ver más lugares o explorar todos en el mapa completo */}
+        {filteredPlaces.length > INITIAL_VISIBLE_COUNT && (
+          <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
+            {hasMorePlaces ? (
+              <button
+                onClick={() => setVisibleCount(prev => prev + 6)}
+                className="px-6 py-3.5 rounded-2xl bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-800 dark:text-white font-bold text-sm shadow-md border border-slate-200 dark:border-slate-700 flex items-center gap-2.5 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
+              >
+                <ChevronDown size={18} className="text-brand-500" />
+                <span>{t('places.showMore')}</span>
+                <span className="px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-900 text-xs font-semibold text-slate-600 dark:text-slate-300">
+                  +{Math.min(6, filteredPlaces.length - visibleCount)} de {filteredPlaces.length - visibleCount}
+                </span>
+              </button>
+            ) : (
+              <button
+                onClick={() => {
+                  setVisibleCount(INITIAL_VISIBLE_COUNT);
+                  document.getElementById('lugares')?.scrollIntoView({ behavior: 'smooth' });
+                }}
+                className="px-6 py-3.5 rounded-2xl bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold text-sm shadow-md border border-slate-200 dark:border-slate-700 flex items-center gap-2 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
+              >
+                <ChevronUp size={18} className="text-slate-500" />
+                <span>{t('places.showLess')}</span>
+              </button>
+            )}
+
+            <a
+              href="#mapa"
+              className="px-6 py-3.5 rounded-2xl bg-gradient-to-r from-brand-600 to-sky-600 hover:from-brand-500 hover:to-sky-500 text-white font-bold text-sm shadow-lg shadow-sky-500/20 flex items-center gap-2.5 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
+            >
+              <Map size={18} />
+              <span>{t('places.viewAllMap')} ({filteredPlaces.length})</span>
+            </a>
+          </div>
+        )}
+
         {filteredPlaces.length === 0 && (
           <div className="text-center py-12">
-            <p className="text-gray-400 text-lg">No hay lugares en esta categoría aún.</p>
+            <p className="text-gray-400 text-lg">{t('places.empty')}</p>
           </div>
         )}
       </main>
@@ -358,25 +391,39 @@ export default function HomePage() {
             viewport={{ once: true }}
             className="mb-8"
           >
-            <h2 className="text-3xl md:text-5xl font-bold mb-4 text-gray-900">{t('map.title')}</h2>
-            <p className="text-gray-500 text-lg">{t('map.subtitle')}</p>
+            <h2 className="text-3xl md:text-5xl font-bold mb-3 text-slate-900">{t('map.title')}</h2>
+            <p className="text-slate-500 text-base sm:text-lg max-w-2xl">{t('map.subtitle')}</p>
           </motion.div>
 
-          <InteractiveMap
-            places={places}
-            activeCategory={activeCategory}
-            routeCoords={routeCoords}
-            routeColor={routeColor}
-            userLocation={userLocation}
-            selectedPlace={selectedPlace}
-            setSelectedPlace={setSelectedPlace}
-            routeInfo={routeInfo}
-            onRouteClick={handleRouteClick}
-            onAudioClick={handleAudioClick}
-            onClearRoute={handleClearRoute}
-          />
+          <Suspense
+            fallback={
+              <div className="w-full h-[520px] rounded-3xl bg-slate-50 border border-sky-100 flex flex-col items-center justify-center text-slate-400 gap-3">
+                <div className="w-12 h-12 rounded-2xl bg-white shadow-sm flex items-center justify-center text-sky-500">
+                  <Compass size={28} className="animate-spin text-sky-500" />
+                </div>
+                <span className="text-xs font-bold text-slate-500">Cargando mapa interactivo de Arica...</span>
+              </div>
+            }
+          >
+            <InteractiveMap
+              places={places}
+              activeCategory={activeCategory}
+              routeCoords={routeCoords}
+              routeColor={routeColor}
+              userLocation={userLocation}
+              selectedPlace={selectedPlace}
+              setSelectedPlace={setSelectedPlace}
+              routeInfo={routeInfo}
+              onRouteClick={handleRouteClick}
+              onAudioClick={handleAudioClick}
+              onClearRoute={handleClearRoute}
+            />
+          </Suspense>
         </div>
       </section>
+
+      {/* FAQ Section */}
+      <FAQSection />
 
       <Footer />
 

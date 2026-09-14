@@ -31,3 +31,10 @@ __pycache__/
 server/.env
 server/.env.*
 !server/.env.example
+
+# Large GIS data dumps & offline map builder assets
+data/sources/
+*.osm.pbf
+*.jar
+public/videos/
+

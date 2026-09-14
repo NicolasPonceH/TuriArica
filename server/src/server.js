@@ -13,7 +13,8 @@ import uploadRouter from './routes/upload.js';
 import aiRouter from './routes/ai.js';
 import weatherRouter from './routes/weather.js';
 import healthRouter from './routes/health.js';
-
+import transitRouter from './routes/transit.js';
+import backupRouter from './routes/backup.js';
 import dotenv from 'dotenv';
 dotenv.config();
 
@@ -55,6 +56,8 @@ app.use('/uploads', express.static(uploadsDir, {
 app.use('/api/auth', authRouter);
 app.use('/api/places', placesRouter);
 app.use('/api/events', eventsRouter);
+app.use('/api/transit', transitRouter);
+app.use('/api/backup', backupRouter);
 app.use('/api/upload', uploadRouter);
 app.use('/api/ai', aiRouter);
 app.use('/api/weather', weatherRouter);
