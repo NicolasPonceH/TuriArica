@@ -7,6 +7,7 @@ import PlaceCard from '../components/home/PlaceCard';
 const InteractiveMap = lazy(() => import('../components/map/InteractiveMap'));
 import AccessibilityToolbar from '../components/shared/AccessibilityToolbar';
 import AssistantModal from '../components/shared/AssistantModal';
+import FloatingAssistantMascot from '../components/mascot/FloatingAssistantMascot';
 import PlaceDetailModal from '../components/shared/PlaceDetailModal';
 import PWAInstallPrompt from '../components/shared/PWAInstallPrompt';
 import EventPopupModal from '../components/shared/EventPopupModal';
@@ -259,6 +260,10 @@ export default function HomePage() {
         <AccessibilityToolbar
           onAssistantClick={() => setShowAssistant(true)}
           onReadPageClick={handleReadPage}
+        />
+
+        <FloatingAssistantMascot
+          onOpenAssistant={() => setShowAssistant(true)}
         />
 
         <PWAInstallPrompt />

@@ -4,6 +4,8 @@ import { X, Send, Bot, Volume2, VolumeX, Bus, Landmark, CloudSun, Utensils, Wave
 import { useLanguage } from '../../contexts/LanguageContext';
 import { API_BASE_URL } from '../../utils/constants';
 
+import TuriMascot from '../mascot/TuriMascot';
+
 const API_BASE = API_BASE_URL;
 
 const QUICK_PROMPTS = [
@@ -19,7 +21,7 @@ export default function AssistantModal({ onClose }) {
 
   const [messages, setMessages] = useState([
     {
-      text: '¡Hola! Soy tu asistente turístico de Arica y Parinacota. Conozco los lugares patrimoniales, playas, horarios, cómo llegar en microbús y el clima en tiempo real.\n\n¿En qué te puedo orientar hoy?',
+      text: '¡Hola! Soy Momita, tu asistente turística de Arica y Parinacota. Conozco los lugares patrimoniales, playas, horarios, cómo llegar en microbús y el clima en tiempo real.\n\n¿En qué te puedo orientar hoy?',
       isBot: true
     }
   ]);
@@ -156,7 +158,7 @@ export default function AssistantModal({ onClose }) {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 z-[80] flex items-end sm:items-center justify-center p-3 sm:p-6 bg-slate-950/50 backdrop-blur-sm"
+      className="fixed inset-0 z-[80] flex items-end sm:items-center justify-center p-3 sm:p-6 bg-slate-950/45 backdrop-blur-md"
       onClick={onClose}
     >
       <motion.div
@@ -165,21 +167,26 @@ export default function AssistantModal({ onClose }) {
         exit={{ y: 20, opacity: 0, scale: 0.95 }}
         transition={{ type: "spring", damping: 26, stiffness: 320 }}
         onClick={e => e.stopPropagation()}
-        className="glass-modal w-full max-w-xl rounded-3xl overflow-hidden shadow-2xl flex flex-col h-[650px] max-h-[90vh] border border-white/80 relative text-slate-800"
+        className="w-full max-w-xl rounded-[28px] overflow-hidden shadow-[0_25px_70px_-15px_rgba(15,23,42,0.35),0_0_0_1px_rgba(255,255,255,0.7),inset_0_1px_2px_rgba(255,255,255,0.9)] bg-white/75 backdrop-blur-2xl backdrop-saturate-150 flex flex-col h-[650px] max-h-[90vh] relative text-slate-800 border border-white/60"
       >
-        {/* Header oficial limpio sin mención a modelos de IA ni botón de reinicio */}
-        <div className="glass-panel px-5 py-3.5 flex justify-between items-center border-b border-white/60 z-10 sticky top-0">
+        {/* Luces de ambiente reflectivas para realzar el glassmorphism */}
+        <div className="absolute -top-20 -left-20 w-64 h-64 bg-sky-400/20 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute top-1/2 -right-20 w-72 h-72 bg-amber-400/15 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -bottom-20 left-1/3 w-64 h-64 bg-teal-400/15 rounded-full blur-3xl pointer-events-none" />
+
+        {/* Header oficial glassmorphic con Momita interactiva */}
+        <div className="px-5 py-3.5 flex justify-between items-center border-b border-white/50 bg-white/45 backdrop-blur-xl z-10 sticky top-0">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-brand-500 to-sky-600 flex items-center justify-center text-white shadow-md shadow-brand-500/25">
-              <Bot size={22} />
+            <div className="w-12 h-12 rounded-2xl bg-white/70 backdrop-blur-md flex items-center justify-center border border-white/90 shadow-[0_2px_12px_rgba(14,165,233,0.15)] overflow-hidden shrink-0">
+              <TuriMascot size={46} label="Momita en vivo" />
             </div>
             <div>
               <h3 className="font-black text-base sm:text-lg text-slate-900 leading-tight">
-                Asistente Turístico de Arica
+                Momita · Asistente de Arica
               </h3>
               <p className="text-xs text-slate-500 font-semibold flex items-center gap-1.5 mt-0.5">
                 <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                <span>Guía oficial · En línea</span>
+                <span>Guía interactiva · En línea</span>
               </p>
             </div>
           </div>
@@ -187,7 +194,7 @@ export default function AssistantModal({ onClose }) {
           <div className="flex items-center gap-1">
             <button
               onClick={onClose}
-              className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 border border-slate-200 transition-colors cursor-pointer"
+              className="p-2 rounded-xl bg-white/60 hover:bg-white/90 text-slate-600 border border-white/80 backdrop-blur-md shadow-sm hover:shadow transition-all cursor-pointer active:scale-95"
               title="Cerrar asistente"
             >
               <X size={18} />
@@ -196,7 +203,7 @@ export default function AssistantModal({ onClose }) {
         </div>
 
         {/* Chat Messages */}
-        <div className="flex-1 p-5 overflow-y-auto flex flex-col gap-4 bg-slate-50/60">
+        <div className="flex-1 p-5 overflow-y-auto flex flex-col gap-4 bg-white/25 backdrop-blur-sm">
           <AnimatePresence initial={false}>
             {messages.map((m, i) => (
               <motion.div
@@ -212,10 +219,10 @@ export default function AssistantModal({ onClose }) {
                 )}
                 <div className="flex flex-col gap-1">
                   <div
-                    className={`p-4 text-xs sm:text-sm leading-relaxed shadow-sm whitespace-pre-wrap ${
+                    className={`p-4 text-xs sm:text-sm leading-relaxed whitespace-pre-wrap ${
                       m.isBot
-                        ? 'bg-white border border-slate-200/80 text-slate-800 rounded-2xl rounded-bl-sm font-medium'
-                        : 'bg-brand-500 text-white rounded-2xl rounded-br-sm font-semibold shadow-brand-500/20'
+                        ? 'bg-white/85 backdrop-blur-xl border border-white/90 text-slate-800 shadow-[0_4px_20px_rgba(15,23,42,0.04),inset_0_1px_1px_rgba(255,255,255,0.9)] rounded-2xl rounded-bl-sm font-medium'
+                        : 'bg-gradient-to-br from-brand-500/90 to-sky-600/90 backdrop-blur-xl border border-white/30 text-white shadow-[0_4px_16px_rgba(14,165,233,0.3),inset_0_1px_1px_rgba(255,255,255,0.4)] rounded-2xl rounded-br-sm font-medium'
                     }`}
                   >
                     {m.text || (m.isStreaming ? 'Consultando información oficial...' : '')}
@@ -245,7 +252,7 @@ export default function AssistantModal({ onClose }) {
                 <div className="w-8 h-8 shrink-0 rounded-xl bg-brand-500 flex items-center justify-center text-white shadow-sm mt-auto mb-1">
                   <Bot size={16} />
                 </div>
-                <div className="bg-white border border-slate-200/80 p-3.5 rounded-2xl rounded-bl-sm flex items-center gap-1.5 shadow-sm h-10">
+                <div className="bg-white/85 backdrop-blur-xl border border-white/90 p-3.5 rounded-2xl rounded-bl-sm flex items-center gap-1.5 shadow-[0_4px_15px_rgba(0,0,0,0.03)] h-10">
                   <motion.div className="w-2 h-2 bg-brand-400 rounded-full" animate={{ y: [0, -4, 0] }} transition={{ repeat: Infinity, duration: 0.6, delay: 0 }} />
                   <motion.div className="w-2 h-2 bg-brand-500 rounded-full" animate={{ y: [0, -4, 0] }} transition={{ repeat: Infinity, duration: 0.6, delay: 0.2 }} />
                   <motion.div className="w-2 h-2 bg-brand-600 rounded-full" animate={{ y: [0, -4, 0] }} transition={{ repeat: Infinity, duration: 0.6, delay: 0.4 }} />
@@ -256,9 +263,9 @@ export default function AssistantModal({ onClose }) {
           <div ref={messagesEndRef} />
         </div>
 
-        {/* Quick Prompts Bar */}
-        <div className="px-4 py-2 bg-white border-t border-slate-100 flex items-center gap-2 overflow-x-auto no-scrollbar">
-          <span className="text-[10px] font-black uppercase tracking-wider text-slate-400 shrink-0">Preguntas frecuentes:</span>
+        {/* Quick Prompts Bar Glassmorphic */}
+        <div className="px-4 py-2.5 bg-white/40 backdrop-blur-xl border-t border-white/50 flex items-center gap-2 overflow-x-auto no-scrollbar">
+          <span className="text-[10px] font-black uppercase tracking-wider text-slate-500 shrink-0">Preguntas frecuentes:</span>
           {QUICK_PROMPTS.map((item, idx) => {
             const ItemIcon = item.Icon;
             return (
@@ -266,7 +273,7 @@ export default function AssistantModal({ onClose }) {
                 key={idx}
                 onClick={() => handleSend(item.query)}
                 disabled={isTyping}
-                className="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-sky-50 text-sky-800 border border-sky-100 hover:bg-sky-100 hover:border-sky-200 whitespace-nowrap transition-colors shrink-0 cursor-pointer disabled:opacity-50 flex items-center gap-1.5"
+                className="px-3 py-1.5 rounded-full text-[11px] font-semibold bg-white/70 hover:bg-white/95 text-sky-900 border border-white/80 hover:border-white shadow-sm hover:shadow transition-all shrink-0 cursor-pointer disabled:opacity-50 flex items-center gap-1.5 active:scale-95 backdrop-blur-md"
               >
                 <ItemIcon size={12} className="text-sky-600" />
                 <span>{item.label}</span>
@@ -275,9 +282,9 @@ export default function AssistantModal({ onClose }) {
           })}
         </div>
 
-        {/* Input Area */}
-        <div className="p-3 sm:p-4 glass-panel border-t border-white/60 pb-safe">
-          <div className="flex items-center gap-2 glass-pill rounded-2xl p-1.5 pr-2 border border-slate-200/80 focus-within:border-brand-400 focus-within:bg-white focus-within:ring-2 focus-within:ring-brand-100 transition-all">
+        {/* Input Area Glassmorphic */}
+        <div className="p-3 sm:p-4 bg-white/40 backdrop-blur-xl border-t border-white/50 pb-safe">
+          <div className="flex items-center gap-2 bg-white/80 backdrop-blur-xl rounded-2xl p-1.5 pr-2 border border-white/90 shadow-[inset_0_2px_4px_rgba(0,0,0,0.02),0_4px_20px_rgba(14,165,233,0.06)] focus-within:bg-white focus-within:border-brand-400 focus-within:ring-4 focus-within:ring-brand-500/15 transition-all">
             <input
               type="text"
               value={input}
@@ -291,8 +298,8 @@ export default function AssistantModal({ onClose }) {
               disabled={!input.trim() || isTyping}
               className={`p-2.5 sm:p-3 rounded-xl flex items-center justify-center transition-all cursor-pointer ${
                 input.trim() && !isTyping
-                  ? 'bg-gradient-to-r from-accent-500 to-amber-500 hover:from-accent-600 hover:to-amber-600 text-white shadow-md shadow-orange-500/20'
-                  : 'bg-slate-200 text-slate-400 cursor-not-allowed'
+                  ? 'bg-gradient-to-r from-accent-500 to-amber-500 hover:from-accent-600 hover:to-amber-600 text-white shadow-[0_4px_15px_rgba(249,115,22,0.3)] hover:shadow-[0_6px_20px_rgba(249,115,22,0.45)] active:scale-95'
+                  : 'bg-slate-200/80 text-slate-400 cursor-not-allowed'
               }`}
             >
               <Send size={16} />

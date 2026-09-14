@@ -9,6 +9,8 @@ import { usePlaces } from '../contexts/PlacesContext';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useEvents } from '../contexts/EventsContext';
 import MapMarker from '../components/map/MapMarker';
+import FloatingAssistantMascot from '../components/mascot/FloatingAssistantMascot';
+import AssistantModal from '../components/shared/AssistantModal';
 import { CATEGORIES } from '../data/categories';
 import { MAP_CONFIG } from '../utils/constants';
 import { MAP_STYLES } from '../utils/mapStyles';
@@ -60,6 +62,7 @@ export default function MapPage() {
   const [genericPopup, setGenericPopup] = useState(null);
   const [userLocation, setUserLocation] = useState(null);
   const [internalRoute, setInternalRoute] = useState(null);
+  const [showAssistant, setShowAssistant] = useState(false);
 
   // Estado de zoom y límites para agrupamiento dinámico (Supercluster)
   const [mapZoom, setMapZoom] = useState(MAP_CONFIG.zoom);
@@ -987,6 +990,15 @@ export default function MapPage() {
           >
             <LucideIcons.Navigation size={18} />
           </button>
+
+          {/* Botón extra interactivo de la Mascota Turi */}
+          <FloatingAssistantMascot
+            onOpenAssistant={() => setShowAssistant(true)}
+            positionClassName="bottom-6 right-3 sm:right-4"
+          />
+
+          {/* Modal del Asistente Turístico */}
+          {showAssistant && <AssistantModal onClose={() => setShowAssistant(false)} />}
         </div>
       </div>
     </div>

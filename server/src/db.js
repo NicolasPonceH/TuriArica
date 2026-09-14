@@ -307,7 +307,6 @@ export function seedDatabase(adminUser = 'admin', adminPass = 'turiarica2026') {
     if (insertedCount > 0) {
       console.log(`[DB] ${insertedCount} nuevos lugares de Arica insertados en la base de datos.`);
     }
-  }
 
   // D. Transit Lines Seed
   const transitCount = db.prepare('SELECT COUNT(*) as count FROM transit_lines').get().count;
@@ -384,7 +383,6 @@ export function seedDatabase(adminUser = 'admin', adminPass = 'turiarica2026') {
     }
     console.log(`[DB] ${initialTransit.length} líneas de transporte público iniciales insertadas.`);
   }
->>>>>>> frontend
 }
 
 // 3. Helper Database Operations
