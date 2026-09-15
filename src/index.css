@@ -200,6 +200,17 @@
   .text-gradient {
     @apply bg-clip-text text-transparent bg-gradient-to-r from-accent-500 to-brand-500;
   }
+
+  /* Ocultar barra de scroll nativa preservando scroll fluido */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none !important;
+    scrollbar-width: none !important;
+  }
 }
 
 /* Modo Nocturno Dinámico (Arica de Noche) */
